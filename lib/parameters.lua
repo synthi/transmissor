@@ -1,5 +1,5 @@
 -- =========================================================
--- PARAMETERS — Transmissor v1.4.0
+-- PARAMETERS — Transmissor v1.5.0
 -- Defines all params, pages, presets (16+16)
 -- =========================================================
 
@@ -85,135 +85,135 @@ end
 function setup_parameters()
   params:add_separator("STATION")
 
-  params:add_control("tx_freq", "TX FREQ",
+  params:add_control("tx_freq", "Tx Frequency",
     cs(1000, 9000, 'exp', 0, 4800))
-  params:add_control("osc_jitter", "PH NOISE",
+  params:add_control("osc_jitter", "Phase Noise",
     cs(0, 1, 'lin', 0, 0.2))
-  params:add_control("pilot_leak", "CAR LEAK",
+  params:add_control("pilot_leak", "Carrier Leak",
     cs(0, 1, 'lin', 0, 0))
-  params:add_control("saturation", "OVERMOD",
+  params:add_control("saturation", "Overmod",
     cs(0, 1, 'lin', 0, 0))
-  params:add_control("harmonic_drive", "HARMONIC",
+  params:add_control("harmonic_drive", "Harmonic Drive",
     cs(0, 1, 'lin', 0, 0))
-  params:add_control("key_click", "PTT CLICK",
+  params:add_control("key_click", "Ptt Click",
     cs(0, 1, 'lin', 0, 0.5))
 
   params:add_separator("PROPAGATION")
 
-  params:add_control("multipath", "MULTIPATH",
+  params:add_control("multipath", "Multipath",
     cs(0, 1, 'lin', 0, 0.3))
-  params:add_control("doppler", "DOPPLER",
+  params:add_control("doppler", "Doppler",
     cs(0, 20, 'lin', 0, 3))
-  params:add_control("fade_rate", "FADE RATE",
+  params:add_control("fade_rate", "Fade Rate",
     cs(0, 1, 'lin', 0, 0.3))
-  params:add_control("fade_depth", "FADE DEPTH",
+  params:add_control("fade_depth", "Fade Depth",
     cs(0, 1, 'lin', 0, 0.5))
-  params:add_control("smear", "DISPERSN",
+  params:add_control("smear", "Dispersion",
     cs(0, 1, 'lin', 0, 0.2))
-  params:add_control("link_quality", "LINK SNR",
+  params:add_control("link_quality", "Link SNR",
     cs(0, 1, 'lin', 0, 1.0))
 
   params:add_separator("INTERFERENCE")
 
-  params:add_control("atmos", "ATMOS",
+  params:add_control("atmos", "Atmospherics",
     cs(0, 1, 'lin', 0, 0.2))
-  params:add_control("space_hum", "GALACTIC",
+  params:add_control("space_hum", "Galactic Noise",
     cs(0, 1, 'lin', 0, 0.05))
-  params:add_control("whistle", "WHISTLE",
+  params:add_control("whistle", "Heterodyne",
     cs(0, 1, 'lin', 0, 0))
-  params:add_control("hum", "PWR HUM",
+  params:add_control("hum", "Power Hum",
     cs(0, 1, 'lin', 0, 0))
-  params:add_control("e_skip", "SPORADIC E",
+  params:add_control("e_skip", "Sporadic E",
     cs(0, 1, 'lin', 0, 0))
-  params:add_control("borealis", "AURORAL",
+  params:add_control("borealis", "Auroral",
     cs(0, 1, 'lin', 0, 0))
 
   params:add_separator("RECEIVER")
 
-  params:add_control("detune", "DETUNE",
+  params:add_control("detune", "Dial Detune",
     cs(-50, 50, 'lin', 0, 0))
-  params:add_control("rx_drift", "OSC DRIFT",
+  params:add_control("rx_drift", "Osc Drift",
     cs(0, 1, 'lin', 0, 0.1))
-  params:add_control("agc_rate", "AGC SPEED",
+  params:add_control("agc_rate", "AGC Speed",
     cs(0, 1, 'lin', 0, 0.4))
-  params:add_control("agc_breath", "AGC PUMP",
+  params:add_control("agc_breath", "AGC Pump",
     cs(0, 1, 'lin', 0, 0.1))
-  params:add_control("rx_bw", "RX BANDWD",
+  params:add_control("rx_bw", "Rx Bandwidth",
     cs(400, 6000, 'exp', 0, 2400))
-  params:add_control("adc_depth", "ADC BITS",
+  params:add_control("adc_depth", "ADC Bits",
     cs(1, 16, 'lin', 0, 16))
 
   params:add_separator("MIX")
 
-  params:add_control("input_trim", "IN GAIN",
+  params:add_control("input_trim", "Input Gain",
     cs(0, 2, 'lin', 0, 1.0))
-  params:add_control("blend", "DRY/WET",
+  params:add_control("blend", "Dry/Wet",
     cs(0, 1, 'lin', 0, 0.7))
-  params:add_control("floor", "NOISE FLR",
+  params:add_control("floor", "Noise Floor",
     cs(0, 1, 'lin', 0, 0.02))
-  params:add_control("hum_level", "CAR VOL",
+  params:add_control("hum_level", "Carrier Vol",
     cs(0, 0.2, 'lin', 0, 0.05))
-  params:add_control("distance", "DISTANCE",
+  params:add_control("distance", "Distance",
     cs(0, 1, 'lin', 0, 0.0))
 
   params:add_separator("EQ")
 
-  params:add_control("locut", "TX LOCUT",
+  params:add_control("locut", "Tx LoCut",
     cs(20, 500, 'exp', 0, 80))
-  params:add_control("hicut", "TX HICUT",
+  params:add_control("hicut", "Tx HiCut",
     cs(500, 10000, 'exp', 0, 4000))
-  params:add_control("rx_hpf", "RX LOCUT",
+  params:add_control("rx_hpf", "Rx LoCut",
     cs(20, 300, 'exp', 0, 60))
 
   params:add_separator("RF FX")
 
-  params:add_control("rev_wet", "REV WET",
+  params:add_control("rev_wet", "Reverb Wet",
     cs(0, 1, 'lin', 0, 0))
-  params:add_control("rev_decay", "REV DECAY",
+  params:add_control("rev_decay", "Reverb Decay",
     cs(0, 1, 'lin', 0, 0.3))
-  params:add_control("rev_damp", "REV DAMP",
+  params:add_control("rev_damp", "Reverb Damp",
     cs(0, 1, 'lin', 0, 0.5))
 
-  params:add_control("ech_wet", "DLY WET",
+  params:add_control("ech_wet", "Delay Wet",
     cs(0, 1, 'lin', 0, 0))
-  params:add_control("ech_time", "DLY TIME",
+  params:add_control("ech_time", "Delay Time",
     cs(0.01, 2.0, 'lin', 0, 0.3))
-  params:add_control("ech_fb", "DLY FB",
+  params:add_control("ech_fb", "Delay FB",
     cs(0, 0.95, 'lin', 0, 0.3))
 
-  params:add_control("cho_wet", "CHO WET",
+  params:add_control("cho_wet", "Chorus Wet",
     cs(0, 1, 'lin', 0, 0))
-  params:add_control("cho_rate", "CHO RATE",
+  params:add_control("cho_rate", "Chorus Rate",
     cs(0.1, 5.0, 'lin', 0, 0.5))
-  params:add_control("cho_depth", "CHO DEPTH",
+  params:add_control("cho_depth", "Chorus Depth",
     cs(0.001, 0.020, 'lin', 0, 0.005))
 
-  params:add_control("com_wet", "COMB WET",
+  params:add_control("com_wet", "Comb Wet",
     cs(0, 1, 'lin', 0, 0))
-  params:add_control("com_freq", "COMB FREQ",
+  params:add_control("com_freq", "Comb Freq",
     cs(20, 500, 'exp', 0, 100))
-  params:add_control("com_fb", "COMB FB",
+  params:add_control("com_fb", "Comb FB",
     cs(0, 0.9, 'lin', 0, 0.3))
 
-  params:add_control("dst_wet", "DST WET",
+  params:add_control("dst_wet", "Dist Wet",
     cs(0, 1, 'lin', 0, 0))
-  params:add_control("dst_drive", "DST DRIVE",
+  params:add_control("dst_drive", "Dist Drive",
     cs(1, 50, 'exp', 0, 3))
-  params:add_control("dst_tone", "DST TONE",
+  params:add_control("dst_tone", "Dist Tone",
     cs(500, 8000, 'exp', 0, 4000))
 
-  params:add_control("ech_rt_wet", "ECHO WET",
+  params:add_control("ech_rt_wet", "Echo Wet",
     cs(0, 1, 'lin', 0, 0))
-  params:add_control("ech_rt_time", "ECHO TIME",
+  params:add_control("ech_rt_time", "Echo Time",
     cs(0.05, 4.0, 'lin', 0, 0.5))
-  params:add_control("ech_rt_fb", "ECHO FB",
-    cs(0, 2.0, 'lin', 0, 0.4))
+  params:add_control("ech_rt_fb", "Echo FB",
+    cs(0, 3.0, 'lin', 0, 0.4))
 
-  params:add_control("fbn_wet", "FBANK WET",
+  params:add_control("fbn_wet", "FBank Wet",
     cs(0, 1, 'lin', 0, 0))
-  params:add_control("fbn_spread", "FBANK SPRD",
+  params:add_control("fbn_spread", "FBank Spread",
     cs(0, 1, 'lin', 0, 0.5))
-  params:add_control("fbn_rate", "FBANK RATE",
+  params:add_control("fbn_rate", "FBank Rate",
     cs(0.1, 3.0, 'lin', 0, 0.3))
 end
 

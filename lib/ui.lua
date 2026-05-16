@@ -1,15 +1,14 @@
 -- =========================================================
--- UI — Transmissor v1.4.1
+-- UI — Transmissor v1.5.0
 -- OLED redraw — guaranteed screen.update()
--- Layout: NAME: VALUE [===bar===]
--- Bar is 32px (35% shorter than before), right-aligned
--- Header: page name left, shift page indicator right
+-- Layout: Name: value [===plasma bar===]
+-- Values right-aligned at x=88, bars at x=93 (35px)
+-- No distance bar — presets at bottom with spacing
 -- =========================================================
 
 function ui_redraw()
   screen.clear()
 
-  -- Defensive: verify pages exists
   if not pages then
     screen.level(15)
     screen.move(0, 20)
@@ -30,7 +29,7 @@ function ui_redraw()
 
     -- LINE 1: Header — page name left, shift indicator right
     screen.level(15)
-    screen.move(0, 8)
+    screen.move(0, 10)
     screen.text(page.name)
 
     -- Shift indicator: "1/2" or "2/2" (only if page has shift params)
@@ -42,72 +41,46 @@ function ui_redraw()
     end
     if has_shift then
       screen.level(6)
-      screen.move(128, 8)
+      screen.move(128, 10)
       screen.text_right(sa and "2/2" or "1/2")
     end
 
-    -- LINES 2-4: Parameters
+    -- LINES 2-4: Parameters (spaced at y=24, 36, 48)
     if dm then
       local d = params:get("distance") or 0
-      screen.level(8)
-      screen.move(0, 20)
-      screen.text("DISTANCE:")
-      screen.level(15)
-      screen.move(55, 20)
-      screen.text(string.format("%.2f", d))
-      -- bar
-      local bar_x, bar_w = 92, 32
-      local filled = math.floor(d * bar_w)
-      if filled > 0 then
-        screen.level(15)
-        screen.rect(bar_x, 14, filled, 6)
-        screen.fill()
-      end
-      if filled < bar_w then
-        screen.level(2)
-        screen.rect(bar_x + filled, 14, bar_w - filled, 6)
-        screen.fill()
-      end
-      screen.level(3)
-      screen.move(0, 30)
+      screen.level(10)
+      screen.move(0, 28)
+      screen.text("Distance: " .. string.format("%.2f", d))
+      screen.level(4)
+      screen.move(0, 42)
       screen.text("ALL ENCODERS > DISTANCE")
+      -- plasma bar for distance
+      draw_plasma_bar(24, d, 0, 1)
+      draw_plasma_bar(36, d, 0, 1)
+      draw_plasma_bar(48, d, 0, 1)
     else
       local idx1 = sa and (page.shift[1] or page.main[1]) or page.main[1]
       local idx2 = sa and (page.shift[2] or page.main[2]) or page.main[2]
       local idx3 = sa and (page.shift[3] or page.main[3]) or page.main[3]
 
       if idx1 then
-        draw_param_bar(18, idx1, params:get(idx1) or 0,
-          param_min(idx1), param_max(idx1))
+        draw_param_line(24, idx1)
       end
       if idx2 then
-        draw_param_bar(28, idx2, params:get(idx2) or 0,
-          param_min(idx2), param_max(idx2))
+        draw_param_line(36, idx2)
       end
       if idx3 then
-        draw_param_bar(38, idx3, params:get(idx3) or 0,
-          param_min(idx3), param_max(idx3))
+        draw_param_line(48, idx3)
       end
     end
 
-    -- LINE 5: Preset info
-    local fid_name = (fidelity_names or {})[cf] or "MAN"
-    local int_name = (interference_names or {})[ci] or "MAN"
+    -- LINE 5: Preset info (bottom, with breathing room)
+    local fid_name = (fidelity_names or {})[cf] or "MANUAL"
+    local int_name = (interference_names or {})[ci] or "MANUAL"
     screen.level(4)
-    screen.move(0, 50)
-    screen.text("FID:" .. cf .. " " .. fid_name .. "  INT:" .. ci .. " " .. int_name)
+    screen.move(0, 61)
+    screen.text("F" .. cf .. ":" .. fid_name .. "  I" .. ci .. ":" .. int_name)
 
-    -- LINE 6: Distance bar (always)
-    local dist_val = params:get("distance") or 0
-    local bar_pixels = math.floor(dist_val * 128)
-    if bar_pixels > 0 then
-      screen.level(15)
-      screen.rect(0, 58, bar_pixels, 5)
-      screen.fill()
-    end
-    screen.level(1)
-    screen.rect(bar_pixels, 58, 128 - bar_pixels, 5)
-    screen.fill()
   end)
 
   if not ok then
@@ -117,69 +90,86 @@ function ui_redraw()
     print("[Transmissor] ui_redraw error: " .. tostring(err))
   end
 
-  -- GUARANTEED screen.update — ALWAYS runs
+  -- GUARANTEED screen.update
   screen.update()
 end
 
 -- =========================================================
--- DRAW PARAM BAR
--- Layout: NAME: VALUE [===bar===]
--- Text left (x=0..88), bar right (x=92, 32px wide)
+-- DRAW PARAM LINE
+-- Layout: Name: value  [===plasma bar===]
+-- Name drawn at x=0, value right-aligned at x=88
+-- Plasma bar at x=93, width=35 (93+35=128)
 -- =========================================================
 
-function draw_param_bar(y_pos, param_name, value, minv, maxv)
-  if not param_name then return end
-  minv = minv or 0
-  maxv = maxv or 1
-  value = value or 0
+function draw_param_line(y_pos, param_id)
+  if not param_id then return end
 
-  local norm = (value - minv) / (maxv - minv + 0.0001)
-  norm = util.clamp(norm, 0, 1)
+  local value = params:get(param_id) or 0
+  local minv = param_min(param_id)
+  local maxv = param_max(param_id)
 
-  -- Get display name from param (already UPPERCASE in parameters.lua)
-  local p = params:lookup_param(param_name)
-  local display_name = ""
+  -- Get display name from param definition
+  local p = params:lookup_param(param_id)
+  local name = ""
   if p and p.name then
-    display_name = p.name
+    name = p.name
   else
-    display_name = string.upper(param_name)
+    name = param_id
   end
 
-  -- Format value string
+  -- Format value: 2 decimals for small ranges, 0 decimals for Hz/kHz ranges
   local range = math.abs(maxv - minv)
   local val_str
-  if range < 0.01 then
+  if range > 200 then
     val_str = string.format("%.0f", value)
-  elseif range < 0.1 then
-    val_str = string.format("%.3f", value)
-  elseif range < 1 then
-    val_str = string.format("%.2f", value)
-  elseif range < 10 then
-    val_str = string.format("%.1f", value)
   else
-    val_str = string.format("%.0f", value)
+    val_str = string.format("%.2f", value)
   end
 
-  -- Build text: "NAME: VALUE" (truncate to fit before bar at x=88)
-  local text = display_name .. ": " .. val_str
-
-  screen.level(15)
+  -- Draw name + ":" at x=0
+  screen.level(8)
   screen.move(0, y_pos)
-  screen.text(string.sub(text, 1, 15))
+  -- Truncate name only if it would collide with value area
+  -- Safe limit: ~14 chars (names are all <= 14 chars)
+  local name_display = string.sub(name, 1, 14) .. ":"
+  screen.text(name_display)
 
-  -- Bar (right side: x=92, w=32)
-  local bar_x = 92
-  local bar_w = 32
-  local filled = math.floor(norm * bar_w)
+  -- Draw value right-aligned at x=88
+  screen.level(15)
+  screen.move(88, y_pos)
+  screen.text_right(val_str)
 
+  -- Draw plasma bar
+  local norm = (value - minv) / (maxv - minv + 0.0001)
+  norm = util.clamp(norm, 0, 1)
+  draw_plasma_bar(y_pos, norm, 0, 1)
+end
+
+-- =========================================================
+-- DRAW PLASMA BAR
+-- Bar at x=93, width=35. Brightness increases with value.
+-- Low values: dim (level 3), high values: bright (level 15)
+-- =========================================================
+
+function draw_plasma_bar(y_pos, norm, minv, maxv)
+  norm = util.clamp(norm, 0, 1)
+
+  local bar_x = 93
+  local bar_w = 35
+  local filled = math.ceil(norm * bar_w)
+
+  -- Filled portion: plasma brightness (level 3→15 based on value)
   if filled > 0 then
-    screen.level(15)
-    screen.rect(bar_x, y_pos - 6, filled, 6)
+    local brightness = math.floor(3 + norm * 12)
+    screen.level(brightness)
+    screen.rect(bar_x, y_pos - 5, filled, 5)
     screen.fill()
   end
+
+  -- Unfilled portion: very dim
   if filled < bar_w then
-    screen.level(2)
-    screen.rect(bar_x + filled, y_pos - 6, bar_w - filled, 6)
+    screen.level(1)
+    screen.rect(bar_x + filled, y_pos - 5, bar_w - filled, 5)
     screen.fill()
   end
 end
@@ -190,5 +180,6 @@ end
 
 return {
   ui_redraw = ui_redraw,
-  draw_param_bar = draw_param_bar
+  draw_param_line = draw_param_line,
+  draw_plasma_bar = draw_plasma_bar
 }
