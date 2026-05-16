@@ -22,6 +22,7 @@ current_fidelity = 1
 current_interference = 1
 distance_mode = false
 shift_active = false
+ptt_active = true  -- PTT gate: true = transmit (key_click=1)
 
 -- =========================================================
 -- MODULE LOADER
@@ -157,8 +158,13 @@ end
 -- =========================================================
 
 function redraw()
-  if _G.ui_redraw then
-    _G.ui_redraw()
+  local ok, err = pcall(function()
+    if _G.ui_redraw then
+      _G.ui_redraw()
+    end
+  end)
+  if not ok then
+    print("[Transmissor] redraw error: " .. tostring(err))
   end
 end
 
@@ -204,6 +210,12 @@ function init()
   metro.init(redraw, 1/15):start()
 
   params:bang()
+
+  -- Sync initial PTT state (transmit by default)
+  if ptt_active then
+    params:set("key_click", 1)
+  end
+
   print("[Transmissor] Ready")
 end
 

@@ -78,15 +78,31 @@ function grid_key(x, y, z)
 
   -- ROW 8
   if y == 8 then
-    if x >= 1 and x <= 8 then
-      -- PAGE SELECTOR (cols 1-8 = pages 1-8)
-      _G.current_page = x
-      _G.distance_mode = false  -- exit distance mode on page change
+    if x == 1 then
+      -- PTT KEY CLICK TOGGLE (col 1)
+      _G.ptt_active = not _G.ptt_active
+      params:set("key_click", _G.ptt_active and 1 or 0)
       return
-    elseif x == 9 then
-      -- DISTANCE MODE TOGGLE (col 9)
+    elseif x == 4 then
+      _G.current_page = 4; _G.distance_mode = false; return  -- SPACE
+    elseif x == 5 then
+      _G.current_page = 5; _G.distance_mode = false; return  -- TEXTURE
+    elseif x == 6 then
+      _G.current_page = 6; _G.distance_mode = false; return  -- DESTROY
+    elseif x == 8 then
+      -- DISTANCE MODE TOGGLE (col 8)
       _G.distance_mode = not _G.distance_mode
       return
+    elseif x == 10 then
+      _G.current_page = 1; _G.distance_mode = false; return  -- TX
+    elseif x == 11 then
+      _G.current_page = 2; _G.distance_mode = false; return  -- AIR
+    elseif x == 12 then
+      _G.current_page = 3; _G.distance_mode = false; return  -- NOISE
+    elseif x == 13 then
+      _G.current_page = 7; _G.distance_mode = false; return  -- RX
+    elseif x == 14 then
+      _G.current_page = 8; _G.distance_mode = false; return  -- MIX
     end
   end
 end
@@ -216,12 +232,30 @@ function grid_redraw()
     render_preset_row(7, _G.current_interference)
 
     -- ROW 8:
-    -- Cols 1-8: PAGE buttons (TX=1, AIR=2, NOISE=3, SPACE=4, TEXTURE=5, DESTROY=6, RX=7, MIX=8)
-    for px = 1, 8 do
-      grid_set_led(px, 8, (px == _G.current_page) and 11 or 1)
-    end
-    -- Col 9: DISTANCE button
-    grid_set_led(9, 8, _G.distance_mode and 11 or 1)
+    -- Col 1: PTT toggle (level 2=off, 11=on)
+    grid_set_led(1, 8, _G.ptt_active and 11 or 2)
+    -- Cols 2-3: empty
+    grid_set_led(2, 8, 0); grid_set_led(3, 8, 0)
+    -- Col 4: SPACE (page 4)
+    grid_set_led(4, 8, (_G.current_page == 4) and 11 or 1)
+    -- Col 5: TEXTURE (page 5)
+    grid_set_led(5, 8, (_G.current_page == 5) and 11 or 1)
+    -- Col 6: DESTROY (page 6)
+    grid_set_led(6, 8, (_G.current_page == 6) and 11 or 1)
+    -- Col 7: empty
+    grid_set_led(7, 8, 0)
+    -- Col 8: DISTANCE toggle
+    grid_set_led(8, 8, _G.distance_mode and 11 or 1)
+    -- Col 9: empty
+    grid_set_led(9, 8, 0)
+    -- Cols 10-14: PAGE buttons (TX=10, AIR=11, NOISE=12, RX=13, MIX=14)
+    grid_set_led(10, 8, (_G.current_page == 1) and 11 or 1)
+    grid_set_led(11, 8, (_G.current_page == 2) and 11 or 1)
+    grid_set_led(12, 8, (_G.current_page == 3) and 11 or 1)
+    grid_set_led(13, 8, (_G.current_page == 7) and 11 or 1)
+    grid_set_led(14, 8, (_G.current_page == 8) and 11 or 1)
+    -- Col 15: empty
+    grid_set_led(15, 8, 0)
     -- Col 16: SHIFT button (4=inactive, 15=active)
     grid_set_led(16, 8, _G.shift_active and 15 or 4)
 
