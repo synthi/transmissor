@@ -1,4 +1,4 @@
--- Transmissor v1.0.3
+-- Transmissor v1.0.4
 -- Shortwave SSB transmission simulator
 -- Audio input → SSB modulation → RF effects → SSB demodulation → output
 -- Based on concepts from EdgeField but completely rewritten for norns
@@ -181,9 +181,14 @@ function init()
     if grid_redraw then grid_redraw() end
   end, 1/25):start()
 
-  -- Screen redraw at 15fps
+  -- Screen redraw at 15fps (pcall para detectar errores sin matar el metro)
   metro.init(function()
-    if redraw then redraw() end
+    if redraw then
+      local ok, err = pcall(redraw)
+      if not ok then
+        print("[Transmissor] UI ERROR: " .. tostring(err))
+      end
+    end
   end, 1/15):start()
 
   params:bang()

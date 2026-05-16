@@ -1,4 +1,4 @@
-// Engine_Transmissor.sc — Transmissor v1.0.3
+// Engine_Transmissor.sc — Transmissor v1.0.4
 // Shortwave SSB transmission simulator engine for norns
 // Audio input → SSB modulation → RF effects → SSB demodulation → output
 //
@@ -48,7 +48,7 @@ Engine_Transmissor : CroneEngine {
 
         voiceBus   = Bus.audio(context.server, 2);
         ambientBus = Bus.audio(context.server, 2);
-        distanceVal = 0.3;
+        distanceVal = 0.0;
 
         // =====================================================
         // CARRIER SYNTH
@@ -113,7 +113,8 @@ Engine_Transmissor : CroneEngine {
             var voiceIn, ambientIn, sig, trail, wetSmooth, fbSmooth;
 
             voiceIn   = In.ar(voiceBus, 2);
-            ambientIn = In.ar(ambientBus, 2);
+            // Filtrar ambient con mismo bandwidth para evitar pitido carrier
+            ambientIn = LPF.ar(In.ar(ambientBus, 2), bandwidth);
 
             sig = HPF.ar(voiceIn, locut);
             sig = LPF.ar(sig, bandwidth);
@@ -149,7 +150,7 @@ Engine_Transmissor : CroneEngine {
                 detune = 0.0, rx_drift = 0.1, agc_rate = 0.4,
                 agc_breath = 0.1, rx_bw = 2400, adc_depth = 16,
                 input_trim = 1.0, blend = 1.0, floor = 0.3,
-                hum_level = 0.05, distance = 0.3,
+                hum_level = 0.05, distance = 0.0,
                 rev_wet = 0.0, rev_decay = 0.3, rev_damp = 0.5,
                 ech_wet = 0.0, ech_time = 0.3, ech_fb = 0.3,
                 cho_wet = 0.0, cho_rate = 0.5, cho_depth = 0.005,
@@ -337,10 +338,12 @@ Engine_Transmissor : CroneEngine {
             // 20. ADC QUANTIZATION
             sig = demod.round(2.0 / pow(2, adc_depth));
 
-            // 21. AGC
+            // 21. AGC — Compander: boost señales bajas, comprime señales altas
             agcKey = sig.abs.max(0.001);
             compSig = Compander.ar(sig, agcKey,
-                0.05, 1, 1 + agc_breath,
+                0.3,                              // threshold
+                1 + (agc_breath * 4),             // slopeBelow > 1 = BOOST quietas
+                1 / (1 + (agc_breath * 2)),       // slopeAbove < 1 = COMPRESS altas
                 agc_rate * 0.1, agc_rate * 0.01);
             sig = LeakDC.ar(compSig);
 
