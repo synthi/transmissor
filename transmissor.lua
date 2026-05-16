@@ -1,8 +1,12 @@
--- Transmissor v1.3.3
+-- Transmissor v1.3.4
 -- Shortwave SSB transmission simulator
 -- Audio input → SSB modulation → RF effects → SSB demodulation → output
 --
 -- Changelog:
+--   v1.3.4  Route floor→noiseSynth, hum_level→carrierSynth (additive with distance),
+--           Key click = real CombL (same position as FX comb, gate dry/wet 0→0.1),
+--           Prime/coprime LFO rates (no resonant alignment),
+--           blend default 0.7, extreme presets fixed (link_quality ≥ 0.15, detune ≤ 35)
 --   v1.3.3  Fix crash: load_module uses include() (norns native path resolve)
 --   v1.3.2  Fix crash: pcall guards on params:get
 --   v1.3.1  Click sounds reworked (no BPF), key_click gradient, page shift fix
@@ -51,11 +55,11 @@ local redraw_metro = nil -- 15fps: screen redraw
 
 local carrier_phase = 0.0
 local static_phase = 0.0
-local carrier_lfo_rate = 0.005
-local static_lfo_rate = 0.005
+local carrier_lfo_rate = 0.0053
+local static_lfo_rate = 0.0071
 local carrier_depth_col = 8
 local static_depth_col = 4
-local LFO_SPEED_MIN = 0.005
+local LFO_SPEED_MIN = 0.0053
 local LFO_SPEED_MAX = 0.084
 local CARRIER_FREQ_DEPTH = 400.0
 local STATIC_DEPTH = 0.50
@@ -205,7 +209,7 @@ function init()
     if Storage then Storage.load_data(id) end
   end
 
-  print("[Transmissor] Ready v1.3.3")
+  print("[Transmissor] Ready v1.3.4")
 end
 
 -- =========================================================

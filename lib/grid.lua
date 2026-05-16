@@ -326,13 +326,18 @@ function grid_key(x, y, z)
       return
     end
 
-    -- PTT (col 1) — momentary: press=click on, release=click off+squelch
+    -- KEY CLICK (col 1) — momentary: gate on press, stutter on release
     if x == 1 then
       _G.ptt_active = (z == 1)
       if z == 1 then
-        engine.trigger_ptt_on()
+        engine.set_key_gate(1)
       else
-        engine.trigger_ptt_off()
+        -- Random stutter: 2-3 rapid on/off triggers
+        local stutters = math.random(2, 3)
+        for i = 1, stutters do
+          engine.set_key_gate(math.random(0, 1))
+        end
+        engine.set_key_gate(0)
       end
       return
     end
@@ -487,9 +492,29 @@ function grid_key(x, y, z)
 
   -- ROWS 1-3: Interactive param bars + recording
   if y >= 1 and y <= 3 then
+
+    -- DISTANCE MODE: taps set distance directly
+    if _G.distance_mode then
+      if z == 1 then
+        press_time[y] = util.time()
+      else
+        if press_time[y] then
+          local hold_time = util.time() - press_time[y]
+          local target_norm = (x - 1) / 15.0  -- col 1 = 0.0, col 16 = 1.0
+
+          if hold_time < 0.15 then
+            params:set("distance", target_norm)
+          else
+            start_ramp(y, "distance", target_norm, hold_time)
+          end
+          press_time[y] = nil
+        end
+      end
+      return
+    end
+
     local page = pages[_G.current_page]
     if not page then return end
-    if _G.distance_mode then return end
 
     local param_name = get_param_for_row(page, y)
     if not param_name then return end
@@ -502,7 +527,7 @@ function grid_key(x, y, z)
     else
       if press_time[y] then
         local hold_time = util.time() - press_time[y]
-        local target_norm = x / 16.0
+        local target_norm = (x - 1) / 15.0  -- col 1 = 0.0, col 16 = 1.0
 
         if hold_time < 0.15 then
           local minv = param_min(param_name)

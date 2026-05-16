@@ -144,7 +144,7 @@ function setup_parameters()
   params:add_control("input_trim", "Input Gain",
     cs(0, 2, 'lin', 0, 1.0))
   params:add_control("blend", "Dry/Wet",
-    cs(0, 1, 'lin', 0, 1))
+    cs(0, 1, 'lin', 0, 0.7))
   params:add_control("floor", "Noise Floor",
     cs(0, 1, 'lin', 0, 0.02))
   params:add_control("hum_level", "Carrier Vol",
@@ -408,73 +408,73 @@ local fidelity_presets = {
     { "tx_freq", 4100 }, { "osc_jitter", 0.5 }, { "pilot_leak", 0.2 },
     { "saturation", 0.2 }, { "harmonic_drive", 0.25 }, { "key_click", 0.2 },
     { "multipath", 0.75 }, { "doppler", 12.0 }, { "fade_rate", 0.75 },
-    { "fade_depth", 0.85 }, { "smear", 0.5 }, { "link_quality", 0.2 },
-    { "detune", 18 }, { "rx_drift", 0.5 }, { "agc_rate", 0.7 },
+    { "fade_depth", 0.85 }, { "smear", 0.5 }, { "link_quality", 0.30 },
+    { "detune", 10 }, { "rx_drift", 0.5 }, { "agc_rate", 0.7 },
     { "agc_breath", 0.25 }, { "rx_bw", 1300 }, { "adc_depth", 8 },
-    { "floor", 0.3 }, { "locut", 480 }, { "hicut", 1800 }, { "rx_hpf", 215 }
+    { "floor", 0.3 }, { "locut", 430 }, { "hicut", 2200 }, { "rx_hpf", 215 }
   },
   [10] = { name = "VOID",
     { "tx_freq", 3950 }, { "osc_jitter", 0.6 }, { "pilot_leak", 0.3 },
     { "saturation", 0.3 }, { "harmonic_drive", 0.35 }, { "key_click", 0.3 },
     { "multipath", 0.85 }, { "doppler", 16.0 }, { "fade_rate", 0.85 },
-    { "fade_depth", 0.95 }, { "smear", 0.6 }, { "link_quality", 0.1 },
-    { "detune", 25 }, { "rx_drift", 0.6 }, { "agc_rate", 0.75 },
+    { "fade_depth", 0.95 }, { "smear", 0.6 }, { "link_quality", 0.25 },
+    { "detune", 15 }, { "rx_drift", 0.6 }, { "agc_rate", 0.75 },
     { "agc_breath", 0.3 }, { "rx_bw", 1100 }, { "adc_depth", 7 },
-    { "floor", 0.35 }, { "locut", 530 }, { "hicut", 1600 }, { "rx_hpf", 230 }
+    { "floor", 0.35 }, { "locut", 430 }, { "hicut", 2400 }, { "rx_hpf", 230 }
   },
   [11] = { name = "XTINA",
     { "tx_freq", 3800 }, { "osc_jitter", 0.7 }, { "pilot_leak", 0.4 },
     { "saturation", 0.4 }, { "harmonic_drive", 0.4 }, { "key_click", 0.35 },
     { "multipath", 0.9 }, { "doppler", 18.0 }, { "fade_rate", 0.9 },
-    { "fade_depth", 0.95 }, { "smear", 0.65 }, { "link_quality", 0.08 },
-    { "detune", 30 }, { "rx_drift", 0.7 }, { "agc_rate", 0.8 },
+    { "fade_depth", 0.95 }, { "smear", 0.65 }, { "link_quality", 0.20 },
+    { "detune", 20 }, { "rx_drift", 0.7 }, { "agc_rate", 0.8 },
     { "agc_breath", 0.35 }, { "rx_bw", 1200 }, { "adc_depth", 6 },
-    { "floor", 0.4 }, { "locut", 580 }, { "hicut", 1400 }, { "rx_hpf", 240 }
+    { "floor", 0.4 }, { "locut", 400 }, { "hicut", 2600 }, { "rx_hpf", 240 }
   },
   [12] = { name = "XBAJA",
     { "tx_freq", 3650 }, { "osc_jitter", 0.8 }, { "pilot_leak", 0.5 },
     { "saturation", 0.5 }, { "harmonic_drive", 0.5 }, { "key_click", 0.4 },
     { "multipath", 0.92 }, { "doppler", 19.0 }, { "fade_rate", 0.92 },
-    { "fade_depth", 0.98 }, { "smear", 0.7 }, { "link_quality", 0.05 },
-    { "detune", 35 }, { "rx_drift", 0.8 }, { "agc_rate", 0.85 },
+    { "fade_depth", 0.98 }, { "smear", 0.7 }, { "link_quality", 0.18 },
+    { "detune", 25 }, { "rx_drift", 0.8 }, { "agc_rate", 0.85 },
     { "agc_breath", 0.4 }, { "rx_bw", 1400 }, { "adc_depth", 6 },
-    { "floor", 0.45 }, { "locut", 630 }, { "hicut", 1200 }, { "rx_hpf", 250 }
+    { "floor", 0.45 }, { "locut", 380 }, { "hicut", 2800 }, { "rx_hpf", 250 }
   },
   [13] = { name = "XFRINGE",
     { "tx_freq", 3500 }, { "osc_jitter", 0.85 }, { "pilot_leak", 0.6 },
     { "saturation", 0.6 }, { "harmonic_drive", 0.6 }, { "key_click", 0.45 },
     { "multipath", 0.95 }, { "doppler", 19.5 }, { "fade_rate", 0.95 },
-    { "fade_depth", 0.99 }, { "smear", 0.75 }, { "link_quality", 0.03 },
-    { "detune", 40 }, { "rx_drift", 0.85 }, { "agc_rate", 0.88 },
+    { "fade_depth", 0.99 }, { "smear", 0.75 }, { "link_quality", 0.17 },
+    { "detune", 30 }, { "rx_drift", 0.85 }, { "agc_rate", 0.88 },
     { "agc_breath", 0.45 }, { "rx_bw", 1600 }, { "adc_depth", 6 },
-    { "floor", 0.5 }, { "locut", 680 }, { "hicut", 1000 }, { "rx_hpf", 260 }
+    { "floor", 0.5 }, { "locut", 350 }, { "hicut", 3000 }, { "rx_hpf", 260 }
   },
   [14] = { name = "XVOID",
     { "tx_freq", 3400 }, { "osc_jitter", 0.9 }, { "pilot_leak", 0.7 },
     { "saturation", 0.7 }, { "harmonic_drive", 0.7 }, { "key_click", 0.5 },
     { "multipath", 0.97 }, { "doppler", 20.0 }, { "fade_rate", 0.97 },
-    { "fade_depth", 0.99 }, { "smear", 0.8 }, { "link_quality", 0.02 },
-    { "detune", 45 }, { "rx_drift", 0.9 }, { "agc_rate", 0.9 },
+    { "fade_depth", 0.99 }, { "smear", 0.8 }, { "link_quality", 0.16 },
+    { "detune", 35 }, { "rx_drift", 0.9 }, { "agc_rate", 0.9 },
     { "agc_breath", 0.48 }, { "rx_bw", 1800 }, { "adc_depth", 6 },
-    { "floor", 0.55 }, { "locut", 730 }, { "hicut", 900 }, { "rx_hpf", 275 }
+    { "floor", 0.55 }, { "locut", 300 }, { "hicut", 3200 }, { "rx_hpf", 275 }
   },
   [15] = { name = "EDGE",
     { "tx_freq", 3300 }, { "osc_jitter", 0.95 }, { "pilot_leak", 0.8 },
     { "saturation", 0.8 }, { "harmonic_drive", 0.8 }, { "key_click", 0.55 },
     { "multipath", 0.98 }, { "doppler", 20.0 }, { "fade_rate", 0.98 },
-    { "fade_depth", 1.0 }, { "smear", 0.85 }, { "link_quality", 0.01 },
-    { "detune", 48 }, { "rx_drift", 0.95 }, { "agc_rate", 0.92 },
+    { "fade_depth", 1.0 }, { "smear", 0.85 }, { "link_quality", 0.15 },
+    { "detune", 35 }, { "rx_drift", 0.95 }, { "agc_rate", 0.92 },
     { "agc_breath", 0.5 }, { "rx_bw", 2000 }, { "adc_depth", 6 },
-    { "floor", 0.6 }, { "locut", 776 }, { "hicut", 750 }, { "rx_hpf", 285 }
+    { "floor", 0.6 }, { "locut", 250 }, { "hicut", 3500 }, { "rx_hpf", 285 }
   },
   [16] = { name = "VOIDMAX",
     { "tx_freq", 3200 }, { "osc_jitter", 1.0 }, { "pilot_leak", 1.0 },
     { "saturation", 1.0 }, { "harmonic_drive", 1.0 }, { "key_click", 0.6 },
     { "multipath", 1.0 }, { "doppler", 20.0 }, { "fade_rate", 1.0 },
-    { "fade_depth", 1.0 }, { "smear", 1.0 }, { "link_quality", 0.0 },
-    { "detune", 50 }, { "rx_drift", 1.0 }, { "agc_rate", 1.0 },
+    { "fade_depth", 1.0 }, { "smear", 1.0 }, { "link_quality", 0.15 },
+    { "detune", 35 }, { "rx_drift", 1.0 }, { "agc_rate", 1.0 },
     { "agc_breath", 0.6 }, { "rx_bw", 2100 }, { "adc_depth", 6 },
-    { "floor", 0.65 }, { "locut", 826 }, { "hicut", 600 }, { "rx_hpf", 295 }
+    { "floor", 0.65 }, { "locut", 200 }, { "hicut", 3800 }, { "rx_hpf", 295 }
   }
 }
 
