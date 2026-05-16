@@ -326,19 +326,10 @@ function grid_key(x, y, z)
       return
     end
 
-    -- KEY CLICK (col 1) — momentary: gate on press, stutter on release
+    -- KEY CLICK (col 1) — simple gate: open on press, close on release
     if x == 1 then
       _G.ptt_active = (z == 1)
-      if z == 1 then
-        engine.set_key_gate(1)
-      else
-        -- Random stutter: 2-3 rapid on/off triggers
-        local stutters = math.random(2, 3)
-        for i = 1, stutters do
-          engine.set_key_gate(math.random(0, 1))
-        end
-        engine.set_key_gate(0)
-      end
+      engine.set_key_gate(z)
       return
     end
 

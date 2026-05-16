@@ -338,7 +338,7 @@ local fidelity_presets = {
     { "multipath", 0.0 }, { "doppler", 0.0 }, { "fade_rate", 0.0 },
     { "fade_depth", 0.0 }, { "smear", 0.0 }, { "link_quality", 1.0 },
     { "detune", 0 }, { "rx_drift", 0 }, { "agc_rate", 0.3 },
-    { "agc_breath", 0.05 }, { "rx_bw", 4000 }, { "adc_depth", 16 },
+    { "agc_breath", 0.05 }, { "rx_bw", 5900 }, { "adc_depth", 16 },
     { "floor", 0.02 }, { "locut", 80 }, { "hicut", 4000 }, { "rx_hpf", 60 }
   },
   [2] = { name = "CLEAN",
@@ -347,7 +347,7 @@ local fidelity_presets = {
     { "multipath", 0.02 }, { "doppler", 0.1 }, { "fade_rate", 0.05 },
     { "fade_depth", 0.05 }, { "smear", 0.02 }, { "link_quality", 0.98 },
     { "detune", 0 }, { "rx_drift", 0.01 }, { "agc_rate", 0.35 },
-    { "agc_breath", 0.06 }, { "rx_bw", 3500 }, { "adc_depth", 16 },
+    { "agc_breath", 0.06 }, { "rx_bw", 5500 }, { "adc_depth", 16 },
     { "floor", 0.02 }, { "locut", 130 }, { "hicut", 3800 }, { "rx_hpf", 70 }
   },
   [3] = { name = "GOOD",
@@ -356,7 +356,7 @@ local fidelity_presets = {
     { "multipath", 0.05 }, { "doppler", 0.3 }, { "fade_rate", 0.1 },
     { "fade_depth", 0.1 }, { "smear", 0.05 }, { "link_quality", 0.95 },
     { "detune", 0 }, { "rx_drift", 0.02 }, { "agc_rate", 0.4 },
-    { "agc_breath", 0.08 }, { "rx_bw", 3000 }, { "adc_depth", 16 },
+    { "agc_breath", 0.08 }, { "rx_bw", 5100 }, { "adc_depth", 16 },
     { "floor", 0.02 }, { "locut", 180 }, { "hicut", 3500 }, { "rx_hpf", 85 }
   },
   [4] = { name = "FAIR",
@@ -365,7 +365,7 @@ local fidelity_presets = {
     { "multipath", 0.1 }, { "doppler", 0.6 }, { "fade_rate", 0.15 },
     { "fade_depth", 0.2 }, { "smear", 0.08 }, { "link_quality", 0.90 },
     { "detune", 0 }, { "rx_drift", 0.04 }, { "agc_rate", 0.45 },
-    { "agc_breath", 0.1 }, { "rx_bw", 2600 }, { "adc_depth", 15 },
+    { "agc_breath", 0.1 }, { "rx_bw", 4600 }, { "adc_depth", 15 },
     { "floor", 0.03 }, { "locut", 230 }, { "hicut", 3200 }, { "rx_hpf", 100 }
   },
   [5] = { name = "AVERAGE",
@@ -374,7 +374,7 @@ local fidelity_presets = {
     { "multipath", 0.15 }, { "doppler", 1.0 }, { "fade_rate", 0.2 },
     { "fade_depth", 0.3 }, { "smear", 0.12 }, { "link_quality", 0.85 },
     { "detune", 0.5 }, { "rx_drift", 0.06 }, { "agc_rate", 0.5 },
-    { "agc_breath", 0.12 }, { "rx_bw", 2400 }, { "adc_depth", 14 },
+    { "agc_breath", 0.12 }, { "rx_bw", 4000 }, { "adc_depth", 14 },
     { "floor", 0.05 }, { "locut", 280 }, { "hicut", 3000 }, { "rx_hpf", 120 }
   },
   [6] = { name = "POOR",
@@ -383,7 +383,7 @@ local fidelity_presets = {
     { "multipath", 0.25 }, { "doppler", 1.8 }, { "fade_rate", 0.3 },
     { "fade_depth", 0.45 }, { "smear", 0.18 }, { "link_quality", 0.75 },
     { "detune", 1.0 }, { "rx_drift", 0.1 }, { "agc_rate", 0.55 },
-    { "agc_breath", 0.15 }, { "rx_bw", 2200 }, { "adc_depth", 12 },
+    { "agc_breath", 0.15 }, { "rx_bw", 3600 }, { "adc_depth", 12 },
     { "floor", 0.08 }, { "locut", 330 }, { "hicut", 2500 }, { "rx_hpf", 145 }
   },
   [7] = { name = "BAD",
@@ -392,7 +392,7 @@ local fidelity_presets = {
     { "multipath", 0.35 }, { "doppler", 3.0 }, { "fade_rate", 0.4 },
     { "fade_depth", 0.6 }, { "smear", 0.25 }, { "link_quality", 0.65 },
     { "detune", 2.0 }, { "rx_drift", 0.15 }, { "agc_rate", 0.6 },
-    { "agc_breath", 0.18 }, { "rx_bw", 1800 }, { "adc_depth", 10 },
+    { "agc_breath", 0.18 }, { "rx_bw", 3200 }, { "adc_depth", 10 },
     { "floor", 0.12 }, { "locut", 380 }, { "hicut", 2200 }, { "rx_hpf", 170 }
   },
   [8] = { name = "DEGRADED",
@@ -401,7 +401,7 @@ local fidelity_presets = {
     { "multipath", 0.5 }, { "doppler", 5.0 }, { "fade_rate", 0.5 },
     { "fade_depth", 0.75 }, { "smear", 0.35 }, { "link_quality", 0.50 },
     { "detune", 4.0 }, { "rx_drift", 0.25 }, { "agc_rate", 0.65 },
-    { "agc_breath", 0.2 }, { "rx_bw", 1500 }, { "adc_depth", 8 },
+    { "agc_breath", 0.2 }, { "rx_bw", 3000 }, { "adc_depth", 8 },
     { "floor", 0.18 }, { "locut", 430 }, { "hicut", 2000 }, { "rx_hpf", 195 }
   },
   [9] = { name = "FRINGE",
@@ -410,7 +410,7 @@ local fidelity_presets = {
     { "multipath", 0.75 }, { "doppler", 12.0 }, { "fade_rate", 0.75 },
     { "fade_depth", 0.85 }, { "smear", 0.5 }, { "link_quality", 0.30 },
     { "detune", 10 }, { "rx_drift", 0.5 }, { "agc_rate", 0.7 },
-    { "agc_breath", 0.25 }, { "rx_bw", 1300 }, { "adc_depth", 8 },
+    { "agc_breath", 0.25 }, { "rx_bw", 2400 }, { "adc_depth", 8 },
     { "floor", 0.3 }, { "locut", 430 }, { "hicut", 2200 }, { "rx_hpf", 215 }
   },
   [10] = { name = "VOID",
@@ -419,7 +419,7 @@ local fidelity_presets = {
     { "multipath", 0.85 }, { "doppler", 16.0 }, { "fade_rate", 0.85 },
     { "fade_depth", 0.95 }, { "smear", 0.6 }, { "link_quality", 0.25 },
     { "detune", 15 }, { "rx_drift", 0.6 }, { "agc_rate", 0.75 },
-    { "agc_breath", 0.3 }, { "rx_bw", 1100 }, { "adc_depth", 7 },
+    { "agc_breath", 0.3 }, { "rx_bw", 1800 }, { "adc_depth", 7 },
     { "floor", 0.35 }, { "locut", 430 }, { "hicut", 2400 }, { "rx_hpf", 230 }
   },
   [11] = { name = "XTINA",

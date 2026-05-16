@@ -110,7 +110,7 @@ Engine_Transmissor : CroneEngine {
             var detuneSmooth, detuneAtten;
             var meteorTrigger, cosmicPing;
             var sigEnv, noiseFloor, eTrig, eEnv, ditherSig;
-            var clickEnv, clickComb, clickFreq, clickFb;
+            var clickComb;
 
             // 1. INPUT
             input = SoundIn.ar(0) * input_trim;
@@ -217,15 +217,10 @@ Engine_Transmissor : CroneEngine {
             rfChorus = rfChorus + (DelayC.ar(rf, 0.03, SinOsc.kr(cho_rate * 0.73).range(0.003, 0.003 + cho_depth * 0.5)) * cho_wet * 0.2);
             rf = Select.ar(cho_wet > 0.001, [ rf, rfChorus ]);
 
-            // KEY CLICK — Real CombL at SAME position as FX comb
-            // Gate opens: dry/wet 0→0.1, Gate closes: 0.1→0
-            // Freq: LFNoise1(0.19) range 130-162 (base ~146)
-            // FB:   LFNoise1(0.31) range 0.42-0.64 (base ~0.50)
-            clickEnv = EnvGen.ar(Env.asr(0.0001, 1, 0.003), key_gate);
-            clickFreq = LFNoise1.kr(0.19).range(130, 162);
-            clickFb = LFNoise1.kr(0.31).range(0.42, 0.64);
-            clickComb = CombL.ar(rf, 0.008, 1.0 / clickFreq, clickFb);
-            rf = rf + (clickComb * key_click * 0.1 * clickEnv);
+            // KEY CLICK — Simple gate: key_gate is 0 or 1
+            // CombL for texture, gate opens/closes instantly
+            clickComb = CombL.ar(rf, 0.008, 1.0 / 146, 0.5);
+            rf = rf + (clickComb * key_click * 0.1 * key_gate);
 
             // FX Comb
             rfComb = Select.ar(com_wet > 0.001, [ rf, CombL.ar(rf, 0.5, 1.0 / com_freq.max(20), com_fb * 8.0) ]);
@@ -324,6 +319,7 @@ Engine_Transmissor : CroneEngine {
         this.addCommand("set_floor", "f", { arg msg;
             floorVal = msg[1];
             noiseSynth.set(\vol, floorVal + (distanceVal * 0.15));
+            masterSynth.set(\ambientVol, (distanceVal * 0.4).max(floorVal * 0.5));
         });
         this.addCommand("set_hum_level", "f", { arg msg;
             humLevelVal = msg[1];
@@ -378,7 +374,7 @@ Engine_Transmissor : CroneEngine {
             noiseSynth.set(\vol, floorVal + (d * 0.15));
             noiseSynth.set(\popRate, d * 4.0 + 0.3);
             masterSynth.set(\bandwidth, (4000 - (d * 2500)).max(1500));
-            masterSynth.set(\ambientVol, d * 0.4);
+            masterSynth.set(\ambientVol, (d * 0.4).max(floorVal * 0.5));
         });
 
         // KILL TRAIL
