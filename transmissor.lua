@@ -44,6 +44,13 @@ local function load_module(name)
 end
 
 -- =========================================================
+-- METRO REFERENCES (prevent GC from collecting them)
+-- =========================================================
+
+local lfo_metro = nil
+local screen_metro = nil
+
+-- =========================================================
 -- LFO STATE (inherited concept from EdgeField)
 -- =========================================================
 
@@ -209,14 +216,16 @@ function init()
   if apply_fidelity_preset then apply_fidelity_preset(1) end
   if apply_interference_preset then apply_interference_preset(1) end
 
-  -- LFO update at 25fps
-  metro.init(function()
+  -- LFO update at 25fps (reference stored to prevent GC)
+  lfo_metro = metro.init(function()
     update_lfos()
     if grid_redraw then grid_redraw() end
-  end, 1/25):start()
+  end, 1/25)
+  lfo_metro:start()
 
-  -- Screen redraw at 15fps (calls top-level redraw() which bridges to ui)
-  metro.init(redraw, 1/15):start()
+  -- Screen redraw at 15fps (reference stored to prevent GC)
+  screen_metro = metro.init(redraw, 1/15)
+  screen_metro:start()
 
   params:bang()
 

@@ -8,7 +8,23 @@ local redraw_count = 0
 function ui_redraw()
   redraw_count = redraw_count + 1
 
+  -- Debug: first 5 frames
+  if redraw_count <= 5 then
+    print("[TRMS UI] redraw #" .. redraw_count ..
+      " pages=" .. tostring(pages ~= nil) ..
+      " ui_redraw=OK")
+  end
+
   screen.clear()
+
+  -- Defensive: verify pages exists
+  if not pages then
+    screen.level(15)
+    screen.move(0, 20)
+    screen.text("ERR: pages=nil #" .. redraw_count)
+    screen.update()
+    return
+  end
 
   local ok, err = pcall(function()
     local cp = _G.current_page or 1

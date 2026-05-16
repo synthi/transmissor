@@ -196,7 +196,7 @@ Engine_Transmissor : CroneEngine {
             rf = Select.ar(cho_wet > 0.001, [ rf, rfChorus ]);
             rfComb = Select.ar(com_wet > 0.001, [ rf, CombL.ar(rf, 0.5, 1.0 / com_freq.max(20), com_fb * 8.0) ]);
             rf = rfComb;
-            rfDist = Select.ar(dst_wet > 0.001, [ rf, (rf * (1 + dst_drive * 2)).tanh / (1 + dst_drive * 2).tanh ]);
+            rfDist = Select.ar(dst_wet > 0.001, [ rf, LPF.ar((rf * (1 + dst_drive * 2)).tanh / (1 + dst_drive * 2).tanh, dst_tone) ]);
             rf = rfDist;
             rfFBank = Select.ar(fbn_wet > 0.001, [ rf,
                 (BPF.ar(rf, tx_freq * (1.0 - fbn_spread * 0.15) * (1 + fbn_wet * 0.05 * LFNoise1.kr(fbn_rate).range(-1, 1)), 0.3) * (1.0 - fbn_spread * 0.3)) +

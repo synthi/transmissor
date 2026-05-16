@@ -533,6 +533,18 @@ local interference_presets = {
 }
 
 -- =========================================================
+-- FORCE CRITICAL GLOBALS
+-- (belt-and-suspenders: load_module does _G[k]=v but
+--  let's guarantee these are accessible everywhere)
+-- =========================================================
+
+_G.pages = pages
+_G.fidelity_names = fidelity_names
+_G.interference_names = interference_names
+_G.fidelity_presets = fidelity_presets
+_G.interference_presets = interference_presets
+
+-- =========================================================
 -- RETURN ALL DATA
 -- =========================================================
 

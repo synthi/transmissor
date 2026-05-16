@@ -15,12 +15,6 @@ end
 
 local _grid = nil
 
--- Hold-to-shift state
-local hold_timer = nil
-local hold_x = nil
-local hold_is_page = false
-local HOLD_THRESHOLD = 0.2  -- seconds to trigger shift
-
 -- Page button column → page mapping
 local page_cols = {
   [4] = 4,   -- SPACE
@@ -64,34 +58,15 @@ function grid_key(x, y, z)
       return
     end
 
-    -- PAGE BUTTONS — hold = shift, tap = change page
+    -- PAGE BUTTONS — press = change page + shift, release = shift off
+    -- Momentary: tap changes page (shift blips 1 frame), hold = page+shift
     if is_page_col(x) then
       if z == 1 then
-        -- PRESS: start hold timer
-        hold_x = x
-        hold_is_page = false
-        hold_timer = metro.init(function()
-          -- Timer expired = HOLD detected → activate shift
-          hold_is_page = true
-          _G.shift_active = true
-          hold_timer:stop()
-        end, HOLD_THRESHOLD, 1)
-        hold_timer:start()
+        _G.current_page = page_cols[x]
+        _G.distance_mode = false
+        _G.shift_active = true
       else
-        -- RELEASE
-        if hold_timer then hold_timer:stop() end
-
-        if hold_is_page then
-          -- Was held → release deactivates shift
-          _G.shift_active = false
-        else
-          -- Was a tap → change page
-          _G.current_page = page_cols[x]
-          _G.distance_mode = false
-        end
-
-        hold_x = nil
-        hold_is_page = false
+        _G.shift_active = false
       end
       return
     end
@@ -304,7 +279,6 @@ function grid_cleanup()
       _grid:refresh()
     end)
   end
-  if hold_timer then hold_timer:stop() end
 end
 
 return {
