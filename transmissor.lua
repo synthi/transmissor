@@ -159,24 +159,13 @@ function key(n, z)
 end
 
 -- =========================================================
--- MAIN REDRAW — DIAGNOSTIC TEST
--- Minimal redraw to isolate display freeze bug
--- If numbers change on OLED → norns calls redraw() OK
--- If frozen → something prevents redraw() from being called
+-- MAIN REDRAW — called by norns automatically
 -- =========================================================
 
 function redraw()
-  screen.clear()
-  screen.level(15)
-  screen.move(0, 10)
-  screen.text("ALIVE " .. os.clock())
-  screen.move(0, 25)
-  screen.text("ui_redraw=" .. tostring(_G.ui_redraw ~= nil))
-  screen.move(0, 40)
-  screen.text("pages=" .. tostring(_G.pages ~= nil))
-  screen.move(0, 55)
-  screen.text("page=" .. tostring(_G.current_page))
-  screen.update()
+  if _G.ui_redraw then
+    _G.ui_redraw()
+  end
 end
 
 -- =========================================================
@@ -212,21 +201,23 @@ function init()
   if apply_interference_preset then apply_interference_preset(1) end
 
   -- Single metro for LFO + grid at 25fps
-  -- (norns calls redraw() automatically — NO separate screen metro!)
   main_metro = metro.init(function()
     update_lfos()
     if grid_redraw then grid_redraw() end
   end, 1/25)
   main_metro:start()
 
-  params:bang()
-
-  -- Sync initial PTT state (transmit by default)
-  if ptt_active then
-    params:set("key_click", 1)
-  end
-
   print("[Transmissor] Ready")
+  -- init() returns HERE — norns registers redraw() callback
+
+  -- Heavy work deferred 600ms so norns screen refresh starts cleanly
+  metro.init(function()
+    params:bang()
+    if ptt_active then
+      params:set("key_click", 1)
+    end
+    print("[Transmissor] Post-init complete")
+  end, 0.6, 1):start()
 end
 
 -- =========================================================
