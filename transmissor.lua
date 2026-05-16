@@ -159,28 +159,24 @@ function key(n, z)
 end
 
 -- =========================================================
--- MAIN REDRAW — Norns architectural requirement
--- Must be top-level in the main script file
+-- MAIN REDRAW — DIAGNOSTIC TEST
+-- Minimal redraw to isolate display freeze bug
+-- If numbers change on OLED → norns calls redraw() OK
+-- If frozen → something prevents redraw() from being called
 -- =========================================================
 
 function redraw()
-  local ok, err = pcall(function()
-    if _G.ui_redraw then
-      _G.ui_redraw()
-    else
-      -- Fallback: show something even without ui module
-      screen.clear()
-      screen.level(15)
-      screen.move(0, 30)
-      screen.text("TRMS loading...")
-      screen.update()
-    end
-  end)
-  if not ok then
-    print("[Transmissor] redraw error: " .. tostring(err))
-    -- Nuclear fallback: always push to screen
-    pcall(function() screen.update() end)
-  end
+  screen.clear()
+  screen.level(15)
+  screen.move(0, 10)
+  screen.text("ALIVE " .. os.clock())
+  screen.move(0, 25)
+  screen.text("ui_redraw=" .. tostring(_G.ui_redraw ~= nil))
+  screen.move(0, 40)
+  screen.text("pages=" .. tostring(_G.pages ~= nil))
+  screen.move(0, 55)
+  screen.text("page=" .. tostring(_G.current_page))
+  screen.update()
 end
 
 -- =========================================================
