@@ -471,40 +471,40 @@ local interference_presets = {
     { "hum", 0 }, { "e_skip", 0 }, { "borealis", 0 }
   },
   [2] = { name = "BACKGROUND",
-    { "atmos", 0.03 }, { "space_hum", 0.01 }, { "whistle", 0 },
+    { "atmos", 0.01 }, { "space_hum", 0.02 }, { "whistle", 0 },
     { "hum", 0 }, { "e_skip", 0 }, { "borealis", 0 }
   },
   [3] = { name = "QUIET",
-    { "atmos", 0.06 }, { "space_hum", 0.03 }, { "whistle", 0.005 },
+    { "atmos", 0.03 }, { "space_hum", 0.05 }, { "whistle", 0.001 },
     { "hum", 0 }, { "e_skip", 0 }, { "borealis", 0 }
   },
   [4] = { name = "TYPICAL",
-    { "atmos", 0.15 }, { "space_hum", 0.05 }, { "whistle", 0.01 },
-    { "hum", 0.01 }, { "e_skip", 0.01 }, { "borealis", 0 }
+    { "atmos", 0.08 }, { "space_hum", 0.10 }, { "whistle", 0.002 },
+    { "hum", 0.001 }, { "e_skip", 0 }, { "borealis", 0 }
   },
   [5] = { name = "ACTIVE",
-    { "atmos", 0.25 }, { "space_hum", 0.08 }, { "whistle", 0.03 },
-    { "hum", 0.02 }, { "e_skip", 0.02 }, { "borealis", 0.01 }
+    { "atmos", 0.15 }, { "space_hum", 0.15 }, { "whistle", 0.003 },
+    { "hum", 0.003 }, { "e_skip", 0.001 }, { "borealis", 0 }
   },
   [6] = { name = "NOISY",
-    { "atmos", 0.4 }, { "space_hum", 0.12 }, { "whistle", 0.05 },
-    { "hum", 0.04 }, { "e_skip", 0.04 }, { "borealis", 0.02 }
+    { "atmos", 0.25 }, { "space_hum", 0.25 }, { "whistle", 0.005 },
+    { "hum", 0.02 }, { "e_skip", 0.003 }, { "borealis", 0.001 }
   },
   [7] = { name = "STORM",
-    { "atmos", 0.6 }, { "space_hum", 0.18 }, { "whistle", 0.08 },
-    { "hum", 0.06 }, { "e_skip", 0.08 }, { "borealis", 0.04 }
+    { "atmos", 0.45 }, { "space_hum", 0.35 }, { "whistle", 0.02 },
+    { "hum", 0.05 }, { "e_skip", 0.05 }, { "borealis", 0 }
   },
   [8] = { name = "CHAOTIC",
-    { "atmos", 0.75 }, { "space_hum", 0.25 }, { "whistle", 0.12 },
-    { "hum", 0.1 }, { "e_skip", 0.12 }, { "borealis", 0.08 }
+    { "atmos", 0.65 }, { "space_hum", 0.50 }, { "whistle", 0.08 },
+    { "hum", 0.10 }, { "e_skip", 0.15 }, { "borealis", 0.05 }
   },
   [9] = { name = "APOCALYPSE",
-    { "atmos", 0.85 }, { "space_hum", 0.35 }, { "whistle", 0.18 },
-    { "hum", 0.15 }, { "e_skip", 0.18 }, { "borealis", 0.15 }
+    { "atmos", 0.85 }, { "space_hum", 0.70 }, { "whistle", 0.15 },
+    { "hum", 0.15 }, { "e_skip", 0.25 }, { "borealis", 0.15 }
   },
   [10] = { name = "VOID",
-    { "atmos", 0.95 }, { "space_hum", 0.5 }, { "whistle", 0.25 },
-    { "hum", 0.2 }, { "e_skip", 0.25 }, { "borealis", 0.25 }
+    { "atmos", 1.0 }, { "space_hum", 0.85 }, { "whistle", 0.25 },
+    { "hum", 0.25 }, { "e_skip", 0.40 }, { "borealis", 0.30 }
   },
   [11] = { name = "XSTORM",
     { "atmos", 1.0 }, { "space_hum", 0.6 }, { "whistle", 0.3 },

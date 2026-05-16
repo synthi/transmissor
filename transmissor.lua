@@ -161,10 +161,19 @@ function redraw()
   local ok, err = pcall(function()
     if _G.ui_redraw then
       _G.ui_redraw()
+    else
+      -- Fallback: show something even without ui module
+      screen.clear()
+      screen.level(15)
+      screen.move(0, 30)
+      screen.text("TRMS loading...")
+      screen.update()
     end
   end)
   if not ok then
     print("[Transmissor] redraw error: " .. tostring(err))
+    -- Nuclear fallback: always push to screen
+    pcall(function() screen.update() end)
   end
 end
 
