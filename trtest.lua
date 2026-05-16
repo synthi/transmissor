@@ -1,4 +1,4 @@
-engine.name = 'Transmissor'
+engine.name = 'PolyPerc'
 
 function init()
   print("TEST INIT")
