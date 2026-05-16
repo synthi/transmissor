@@ -31,15 +31,15 @@ local interference_names = {
 -- =========================================================
 
 local pages = {
-  [1] = { name = "TX",
+  [1] = { name = "TRANSMITTER",
     main = { "tx_freq", "osc_jitter", "pilot_leak" },
     shift = { "saturation", "harmonic_drive", "key_click" }
   },
-  [2] = { name = "AIR",
+  [2] = { name = "PROPAGATION",
     main = { "multipath", "fade_rate", "fade_depth" },
     shift = { "doppler", "smear", "link_quality" }
   },
-  [3] = { name = "NOISE",
+  [3] = { name = "INTERFERENCE",
     main = { "atmos", "space_hum", "whistle" },
     shift = { "hum", "e_skip", "borealis" }
   },
@@ -55,7 +55,7 @@ local pages = {
     main = { "dst_wet", "dst_drive", "dst_tone" },
     shift = { "fbn_wet", "fbn_spread", "fbn_rate" }
   },
-  [7] = { name = "RX",
+  [7] = { name = "RECEIVER",
     main = { "detune", "rx_drift", "rx_bw" },
     shift = { "agc_rate", "agc_breath", "adc_depth" }
   },
@@ -63,7 +63,7 @@ local pages = {
     main = { "input_trim", "blend", "floor" },
     shift = { "hum_level", "distance", nil }
   },
-  [9] = { name = "EQ",
+  [9] = { name = "EQUALIZER",
     main = { "locut", "hicut", "rx_hpf" },
     shift = { nil, nil, nil }
   },
@@ -85,135 +85,135 @@ end
 function setup_parameters()
   params:add_separator("STATION")
 
-  params:add_control("tx_freq", "TX Freq",
+  params:add_control("tx_freq", "TX FREQ",
     cs(1000, 9000, 'exp', 0, 4800))
-  params:add_control("osc_jitter", "Phase Noise",
+  params:add_control("osc_jitter", "PH NOISE",
     cs(0, 1, 'lin', 0, 0.2))
-  params:add_control("pilot_leak", "Carrier Leak",
+  params:add_control("pilot_leak", "CAR LEAK",
     cs(0, 1, 'lin', 0, 0))
-  params:add_control("saturation", "Overmod",
+  params:add_control("saturation", "OVERMOD",
     cs(0, 1, 'lin', 0, 0))
-  params:add_control("harmonic_drive", "Harmonics",
+  params:add_control("harmonic_drive", "HARMONIC",
     cs(0, 1, 'lin', 0, 0))
-  params:add_control("key_click", "PTT Click",
+  params:add_control("key_click", "PTT CLICK",
     cs(0, 1, 'lin', 0, 0.5))
 
   params:add_separator("PROPAGATION")
 
-  params:add_control("multipath", "Multipath",
+  params:add_control("multipath", "MULTIPATH",
     cs(0, 1, 'lin', 0, 0.3))
-  params:add_control("doppler", "Doppler",
+  params:add_control("doppler", "DOPPLER",
     cs(0, 20, 'lin', 0, 3))
-  params:add_control("fade_rate", "Fade Rate",
+  params:add_control("fade_rate", "FADE RATE",
     cs(0, 1, 'lin', 0, 0.3))
-  params:add_control("fade_depth", "Fade Depth",
+  params:add_control("fade_depth", "FADE DEPTH",
     cs(0, 1, 'lin', 0, 0.5))
-  params:add_control("smear", "Dispersion",
+  params:add_control("smear", "DISPERSN",
     cs(0, 1, 'lin', 0, 0.2))
-  params:add_control("link_quality", "Link SNR",
+  params:add_control("link_quality", "LINK SNR",
     cs(0, 1, 'lin', 0, 1.0))
 
   params:add_separator("INTERFERENCE")
 
-  params:add_control("atmos", "Atmospherics",
+  params:add_control("atmos", "ATMOS",
     cs(0, 1, 'lin', 0, 0.2))
-  params:add_control("space_hum", "Galactic",
+  params:add_control("space_hum", "GALACTIC",
     cs(0, 1, 'lin', 0, 0.05))
-  params:add_control("whistle", "Heterodyne",
+  params:add_control("whistle", "WHISTLE",
     cs(0, 1, 'lin', 0, 0))
-  params:add_control("hum", "Power Hum",
+  params:add_control("hum", "PWR HUM",
     cs(0, 1, 'lin', 0, 0))
-  params:add_control("e_skip", "Sporadic E",
+  params:add_control("e_skip", "SPORADIC E",
     cs(0, 1, 'lin', 0, 0))
-  params:add_control("borealis", "Auroral",
+  params:add_control("borealis", "AURORAL",
     cs(0, 1, 'lin', 0, 0))
 
   params:add_separator("RECEIVER")
 
-  params:add_control("detune", "Dial Detune",
+  params:add_control("detune", "DETUNE",
     cs(-50, 50, 'lin', 0, 0))
-  params:add_control("rx_drift", "Osc Drift",
+  params:add_control("rx_drift", "OSC DRIFT",
     cs(0, 1, 'lin', 0, 0.1))
-  params:add_control("agc_rate", "AGC Speed",
+  params:add_control("agc_rate", "AGC SPEED",
     cs(0, 1, 'lin', 0, 0.4))
-  params:add_control("agc_breath", "AGC Pump",
+  params:add_control("agc_breath", "AGC PUMP",
     cs(0, 1, 'lin', 0, 0.1))
-  params:add_control("rx_bw", "RX Bandwidth",
+  params:add_control("rx_bw", "RX BANDWD",
     cs(400, 6000, 'exp', 0, 2400))
-  params:add_control("adc_depth", "ADC Bits",
+  params:add_control("adc_depth", "ADC BITS",
     cs(1, 16, 'lin', 0, 16))
 
   params:add_separator("MIX")
 
-  params:add_control("input_trim", "Input Gain",
+  params:add_control("input_trim", "IN GAIN",
     cs(0, 2, 'lin', 0, 1.0))
-  params:add_control("blend", "Dry/Wet",
+  params:add_control("blend", "DRY/WET",
     cs(0, 1, 'lin', 0, 0.7))
-  params:add_control("floor", "Noise Floor",
+  params:add_control("floor", "NOISE FLR",
     cs(0, 1, 'lin', 0, 0.02))
-  params:add_control("hum_level", "Carrier Vol",
+  params:add_control("hum_level", "CAR VOL",
     cs(0, 0.2, 'lin', 0, 0.05))
-  params:add_control("distance", "Distance",
+  params:add_control("distance", "DISTANCE",
     cs(0, 1, 'lin', 0, 0.0))
 
   params:add_separator("EQ")
 
-  params:add_control("locut", "TX LoCut",
+  params:add_control("locut", "TX LOCUT",
     cs(20, 500, 'exp', 0, 80))
-  params:add_control("hicut", "TX HiCut",
+  params:add_control("hicut", "TX HICUT",
     cs(500, 10000, 'exp', 0, 4000))
-  params:add_control("rx_hpf", "RX LoCut",
+  params:add_control("rx_hpf", "RX LOCUT",
     cs(20, 300, 'exp', 0, 60))
 
   params:add_separator("RF FX")
 
-  params:add_control("rev_wet", "Reverb Wet",
+  params:add_control("rev_wet", "REV WET",
     cs(0, 1, 'lin', 0, 0))
-  params:add_control("rev_decay", "Reverb Decay",
+  params:add_control("rev_decay", "REV DECAY",
     cs(0, 1, 'lin', 0, 0.3))
-  params:add_control("rev_damp", "Reverb Damp",
+  params:add_control("rev_damp", "REV DAMP",
     cs(0, 1, 'lin', 0, 0.5))
 
-  params:add_control("ech_wet", "Delay Wet",
+  params:add_control("ech_wet", "DLY WET",
     cs(0, 1, 'lin', 0, 0))
-  params:add_control("ech_time", "Delay Time",
+  params:add_control("ech_time", "DLY TIME",
     cs(0.01, 2.0, 'lin', 0, 0.3))
-  params:add_control("ech_fb", "Delay FB",
+  params:add_control("ech_fb", "DLY FB",
     cs(0, 0.95, 'lin', 0, 0.3))
 
-  params:add_control("cho_wet", "Chorus Wet",
+  params:add_control("cho_wet", "CHO WET",
     cs(0, 1, 'lin', 0, 0))
-  params:add_control("cho_rate", "Chorus Rate",
+  params:add_control("cho_rate", "CHO RATE",
     cs(0.1, 5.0, 'lin', 0, 0.5))
-  params:add_control("cho_depth", "Chorus Depth",
+  params:add_control("cho_depth", "CHO DEPTH",
     cs(0.001, 0.020, 'lin', 0, 0.005))
 
-  params:add_control("com_wet", "Comb Wet",
+  params:add_control("com_wet", "COMB WET",
     cs(0, 1, 'lin', 0, 0))
-  params:add_control("com_freq", "Comb Freq",
+  params:add_control("com_freq", "COMB FREQ",
     cs(20, 500, 'exp', 0, 100))
-  params:add_control("com_fb", "Comb FB",
+  params:add_control("com_fb", "COMB FB",
     cs(0, 0.9, 'lin', 0, 0.3))
 
-  params:add_control("dst_wet", "Dist Wet",
+  params:add_control("dst_wet", "DST WET",
     cs(0, 1, 'lin', 0, 0))
-  params:add_control("dst_drive", "Dist Drive",
+  params:add_control("dst_drive", "DST DRIVE",
     cs(1, 50, 'exp', 0, 3))
-  params:add_control("dst_tone", "Dist Tone",
+  params:add_control("dst_tone", "DST TONE",
     cs(500, 8000, 'exp', 0, 4000))
 
-  params:add_control("ech_rt_wet", "Echo Return Wet",
+  params:add_control("ech_rt_wet", "ECHO WET",
     cs(0, 1, 'lin', 0, 0))
-  params:add_control("ech_rt_time", "Echo Return Time",
-    cs(0.05, 2.0, 'lin', 0, 0.5))
-  params:add_control("ech_rt_fb", "Echo Return FB",
-    cs(0, 1.5, 'lin', 0, 0.4))
+  params:add_control("ech_rt_time", "ECHO TIME",
+    cs(0.05, 4.0, 'lin', 0, 0.5))
+  params:add_control("ech_rt_fb", "ECHO FB",
+    cs(0, 2.0, 'lin', 0, 0.4))
 
-  params:add_control("fbn_wet", "FBank Wet",
+  params:add_control("fbn_wet", "FBANK WET",
     cs(0, 1, 'lin', 0, 0))
-  params:add_control("fbn_spread", "FBank Spread",
+  params:add_control("fbn_spread", "FBANK SPRD",
     cs(0, 1, 'lin', 0, 0.5))
-  params:add_control("fbn_rate", "FBank Rate",
+  params:add_control("fbn_rate", "FBANK RATE",
     cs(0.1, 3.0, 'lin', 0, 0.3))
 end
 

@@ -276,7 +276,7 @@ Engine_Transmissor : CroneEngine {
             // 22. OUTPUT + ECHO RETURN FEEDBACK (radio echo)
             Out.ar(voiceBus, sig ! 2);
             LocalOut.ar(Limiter.ar(
-                DelayL.ar(sig, 2.0, ech_rt_time.max(0.05)) * ech_rt_fb,
+                DelayL.ar(sig, 4.0, ech_rt_time.max(0.05)) * ech_rt_fb,
                 0.95
             ));
 
