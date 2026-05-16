@@ -49,7 +49,7 @@ ptt_active = false  -- Key Click crackle: OFF by default
 -- =========================================================
 
 local function load_module(name)
-  local path = _path.code .. "Transmissor/lib/" .. name .. ".lua"
+  local path = _path.this .. "lib/" .. name .. ".lua"
   local ok, result = pcall(dofile, path)
   if not ok then
     print("[Transmissor] Error loading " .. name .. ": " .. tostring(result))
@@ -94,9 +94,12 @@ local function update_lfos()
   carrier_phase = (carrier_phase + carrier_lfo_rate) % 1.0
   static_phase  = (static_phase  + static_lfo_rate)  % 1.0
 
+  local ok, tx_freq_val = pcall(params.get, params, "tx_freq")
+  if not ok then return end
+
   local carrier_depth = (carrier_depth_col / 15.0) * CARRIER_FREQ_DEPTH
   local carrier_sine  = math.sin(carrier_phase * math.pi * 2)
-  local carrier_val   = params:get("tx_freq") + (carrier_sine * carrier_depth)
+  local carrier_val   = tx_freq_val + (carrier_sine * carrier_depth)
   -- LFO modula solo el synth de carrier ambiente, NO el inputSynth
   engine.set_carrier_freq(math.max(100, carrier_val))
 
@@ -104,8 +107,9 @@ local function update_lfos()
   local static_sine  = math.sin(static_phase * math.pi * 2) +
                        math.sin(static_phase * math.pi * 5.7) * 0.3
   static_sine = static_sine / 1.3
-  local static_base = params:get("floor")
-  local static_val = static_base + (static_sine * static_depth * static_base)
+  local _, floor_val = pcall(params.get, params, "floor")
+  floor_val = floor_val or 0
+  local static_val = floor_val + (static_sine * static_depth * floor_val)
   engine.set_floor(math.max(0, static_val))
 end
 
@@ -115,6 +119,9 @@ end
 
 local function adjust_param(name, delta)
   if not name then return end
+
+  local ok = pcall(params.get, params, name)
+  if not ok then return end
 
   local minv = param_min(name)
   local maxv = param_max(name)
@@ -238,7 +245,7 @@ function init()
     if Storage then Storage.load_data(id) end
   end
 
-  print("[Transmissor] Ready v1.3.0")
+  print("[Transmissor] Ready v1.3.2")
 end
 
 -- =========================================================
