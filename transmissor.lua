@@ -1,9 +1,11 @@
--- Transmissor v1.1.1
+-- Transmissor v1.1.2
 -- Shortwave SSB transmission simulator
 -- Audio input → SSB modulation → RF effects → SSB demodulation → output
 -- Based on concepts from EdgeField but completely rewritten for norns
 --
 -- Changelog:
+--   v1.1.2  Receiver hum 50Hz (audio domain), distance no override blend,
+--           Presets: locut 80→826, rx_bw rises 11-16 (noise preserved)
 --   v1.1.1  Whistle -20dB, SNR fix (multipath/AGC/compander),
 --           Key click = crackle generator (no input gate),
 --           EQ page 9: locut/hicut/rx_hpf params,

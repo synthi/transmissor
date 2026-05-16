@@ -1,8 +1,9 @@
-// Engine_Transmissor.sc — Transmissor v1.1.1
+// Engine_Transmissor.sc — Transmissor v1.1.2
 // Shortwave SSB transmission simulator engine for norns
 // Audio input → SSB modulation → RF effects → SSB demodulation → output
 //
 // Changelog:
+//   v1.1.2  Receiver hum 50Hz (audio domain), distance no override blend
 //   v1.1.1  Whistle -20dB, SNR fix (multipath/AGC/compander),
 //           Key click = crackle generator (no input gate),
 //           EQ params: locut/hicut/rx_hpf (page 9),
@@ -235,6 +236,10 @@ Engine_Transmissor : CroneEngine {
             sig = HPF.ar(sig, rx_hpf);
             sig = LPF.ar(sig, rx_bw);
 
+            // 22b. RECEIVER HUM (50Hz mains — receiving on different continent)
+            sig = sig + (hum * 0.08 * (
+                SinOsc.ar(50) * 0.5 + SinOsc.ar(100) * 0.3 + SinOsc.ar(150) * 0.15));
+
             // 23. BLEND
             sig = (input * (1 - blend)) + (sig * blend);
 
@@ -311,7 +316,6 @@ Engine_Transmissor : CroneEngine {
             noiseSynth.set(\popRate, d * 4.0 + 0.3);
             masterSynth.set(\bandwidth, (4000 - (d * 2500)).max(1500));
             masterSynth.set(\ambientVol, d * 0.4);
-            inputSynth.set(\blend, 1.0 - (d * 0.15));
         });
 
         // KILL TRAIL

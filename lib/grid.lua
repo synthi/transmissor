@@ -1,5 +1,5 @@
 -- =========================================================
--- GRID — Transmissor v1.1.1
+-- GRID — Transmissor v1.1.2
 -- Differential grid state management + key handler
 -- Hold page button = shift for that page
 -- Rows 1-3: active params, Row 4: empty separator
