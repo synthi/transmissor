@@ -163,6 +163,7 @@ end
 -- =========================================================
 
 function redraw()
+  print("[TRMS] redraw() called t=" .. os.clock())
   if _G.ui_redraw then
     _G.ui_redraw()
   end
