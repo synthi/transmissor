@@ -1,5 +1,5 @@
 -- =========================================================
--- STORAGE — Transmissor v1.3.0
+-- STORAGE — Transmissor v1.4.0
 -- Pset save/load: user presets + sequencer data
 -- =========================================================
 

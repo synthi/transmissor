@@ -1,5 +1,5 @@
 -- =========================================================
--- PARAMETERS — Transmissor v1.3.0
+-- PARAMETERS — Transmissor v1.4.0
 -- Defines all params, pages, presets (16+16)
 -- =========================================================
 
@@ -65,6 +65,10 @@ local pages = {
   },
   [9] = { name = "EQ",
     main = { "locut", "hicut", "rx_hpf" },
+    shift = { nil, nil, nil }
+  },
+  [10] = { name = "RADIO ECHO",
+    main = { "ech_rt_wet", "ech_rt_time", "ech_rt_fb" },
     shift = { nil, nil, nil }
   }
 }
@@ -170,11 +174,11 @@ function setup_parameters()
   params:add_control("rev_damp", "Reverb Damp",
     cs(0, 1, 'lin', 0, 0.5))
 
-  params:add_control("ech_wet", "Echo Wet",
+  params:add_control("ech_wet", "Delay Wet",
     cs(0, 1, 'lin', 0, 0))
-  params:add_control("ech_time", "Echo Time",
+  params:add_control("ech_time", "Delay Time",
     cs(0.01, 2.0, 'lin', 0, 0.3))
-  params:add_control("ech_fb", "Echo FB",
+  params:add_control("ech_fb", "Delay FB",
     cs(0, 0.95, 'lin', 0, 0.3))
 
   params:add_control("cho_wet", "Chorus Wet",
@@ -197,6 +201,13 @@ function setup_parameters()
     cs(1, 50, 'exp', 0, 3))
   params:add_control("dst_tone", "Dist Tone",
     cs(500, 8000, 'exp', 0, 4000))
+
+  params:add_control("ech_rt_wet", "Echo Return Wet",
+    cs(0, 1, 'lin', 0, 0))
+  params:add_control("ech_rt_time", "Echo Return Time",
+    cs(0.05, 2.0, 'lin', 0, 0.5))
+  params:add_control("ech_rt_fb", "Echo Return FB",
+    cs(0, 1.5, 'lin', 0, 0.4))
 
   params:add_control("fbn_wet", "FBank Wet",
     cs(0, 1, 'lin', 0, 0))
@@ -298,6 +309,11 @@ function setup_param_actions()
   params:set_action("fbn_wet", function(x) engine.set_fbn_wet(x) end)
   params:set_action("fbn_spread", function(x) engine.set_fbn_spread(x) end)
   params:set_action("fbn_rate", function(x) engine.set_fbn_rate(x) end)
+
+  -- ECHO RETURN
+  params:set_action("ech_rt_wet", function(x) engine.set_ech_rt_wet(x) end)
+  params:set_action("ech_rt_time", function(x) engine.set_ech_rt_time(x) end)
+  params:set_action("ech_rt_fb", function(x) engine.set_ech_rt_fb(x) end)
 end
 
 -- =========================================================

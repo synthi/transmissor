@@ -1,8 +1,12 @@
--- Transmissor v1.3.4
+-- Transmissor v1.4.0
 -- Shortwave SSB transmission simulator
 -- Audio input → SSB modulation → RF effects → SSB demodulation → output
 --
 -- Changelog:
+--   v1.4.0  Echo Return (radio echo via LocalIn/LocalOut — accumulative degradation),
+--           Key click = CombL identical to FX Comb (freq=160, fb=5.12),
+--           Noise floor minimum reduced 8-9 dB (floor×0.18),
+--           Rename echo FX → delay FX
 --   v1.3.4  Route floor→noiseSynth, hum_level→carrierSynth (additive with distance),
 --           Key click = real CombL (same position as FX comb, gate dry/wet 0→0.1),
 --           Prime/coprime LFO rates (no resonant alignment),
@@ -209,7 +213,7 @@ function init()
     if Storage then Storage.load_data(id) end
   end
 
-  print("[Transmissor] Ready v1.3.4")
+  print("[Transmissor] Ready v1.4.0")
 end
 
 -- =========================================================

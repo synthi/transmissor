@@ -1,5 +1,5 @@
 -- =========================================================
--- GRID — Transmissor v1.3.1
+-- GRID — Transmissor v1.4.0
 -- Rows 1-3: interactive param bars (tap/hold ramp) + seq recording
 -- Rows 4-5: Fidelity/Interference presets + seq recording
 -- Row 6: empty
@@ -22,6 +22,7 @@ local page_cols = {
   [4] = 4,   -- SPACE
   [5] = 5,   -- TEXTURE
   [6] = 6,   -- DESTROY
+  [8] = 10,  -- RADIO ECHO
   [9] = 9,   -- EQ
   [10] = 1,  -- TX
   [11] = 2,  -- AIR
@@ -47,7 +48,8 @@ local ALL_PARAMS = {
   "cho_wet", "cho_rate", "cho_depth",
   "com_wet", "com_freq", "com_fb",
   "dst_wet", "dst_drive", "dst_tone",
-  "fbn_wet", "fbn_spread", "fbn_rate"
+  "fbn_wet", "fbn_spread", "fbn_rate",
+  "ech_rt_wet", "ech_rt_time", "ech_rt_fb"
 }
 
 -- =========================================================
@@ -330,12 +332,6 @@ function grid_key(x, y, z)
     if x == 1 then
       _G.ptt_active = (z == 1)
       engine.set_key_gate(z)
-      return
-    end
-
-    -- DISTANCE (col 8) — toggle
-    if x == 8 and z == 1 then
-      _G.distance_mode = not _G.distance_mode
       return
     end
 
@@ -683,8 +679,8 @@ function grid_redraw()
     grid_set_led(6, 8, (_G.current_page == 6) and 11 or 1)
     -- Col 7: empty
     grid_set_led(7, 8, 0)
-    -- Col 8: DISTANCE
-    grid_set_led(8, 8, _G.distance_mode and 11 or 1)
+    -- Col 8: RADIO ECHO page
+    grid_set_led(8, 8, (_G.current_page == 10) and 11 or 1)
     -- Col 9: EQ page
     grid_set_led(9, 8, (_G.current_page == 9) and 11 or 1)
     -- Cols 10-14: Pages (TX=10, AIR=11, NOISE=12, RX=13, MIX=14)
@@ -741,7 +737,7 @@ function init_grid()
   end
   _G.seq_active = false
 
-  print("[Transmissor] Grid connected (v1.3.1)")
+  print("[Transmissor] Grid connected (v1.4.0)")
 end
 
 function grid_cleanup()

@@ -1,17 +1,14 @@
-// Engine_Transmissor.sc — Transmissor v1.3.4
+// Engine_Transmissor.sc — Transmissor v1.4.0
 // Shortwave SSB transmission simulator engine for norns
 // Audio input → SSB modulation → RF effects → SSB demodulation → output
 //
 // Changelog:
-//   v1.3.4  Route floor→noiseSynth, hum_level→carrierSynth (additive with distance),
-//           Key click = real CombL (same position as FX comb, gate dry/wet 0→0.1),
-//           Prime/coprime LFO rates (no resonant alignment),
-//           blend default 0.7
+//   v1.4.0  Echo Return (radio echo via LocalIn/LocalOut — accumulative degradation),
+//           Key click = CombL identical to FX Comb (freq=160, fb=5.12),
+//           Noise floor minimum reduced 8-9 dB (floor×0.18),
+//           Rename echo FX → delay FX
+//   v1.3.4  Route floor→noiseSynth, hum_level→carrierSynth
 //   v1.3.0  Cosmic ping, Meteor scatter stable
-//   v1.2.0  Dispersion hybrid, no accidental blips
-//   v1.1.2  Receiver hum 50Hz, distance no override blend
-//   v1.1.1  Whistle -20dB, SNR fix, EQ params, Demod LPF 5kHz
-//   v1.1.0  redraw_metro fix, Phase noise, AGC 2ms, Auroral
 //   v1.0    Initial release
 
 Engine_Transmissor : CroneEngine {
@@ -101,7 +98,8 @@ Engine_Transmissor : CroneEngine {
                 cho_wet = 0.0, cho_rate = 0.5, cho_depth = 0.005,
                 com_wet = 0.0, com_freq = 100, com_fb = 0.3,
                 dst_wet = 0.0, dst_drive = 3.0, dst_tone = 4000,
-                fbn_wet = 0.0, fbn_spread = 0.5, fbn_rate = 0.3;
+                fbn_wet = 0.0, fbn_spread = 0.5, fbn_rate = 0.3,
+                ech_rt_wet = 0.0, ech_rt_time = 0.5, ech_rt_fb = 0.4;
 
             var input, hilbert, rf, rfMultipath, rfEffects;
             var demod, sig, compSig, agcKey;
@@ -111,9 +109,14 @@ Engine_Transmissor : CroneEngine {
             var meteorTrigger, cosmicPing;
             var sigEnv, noiseFloor, eTrig, eEnv, ditherSig;
             var clickComb;
+            var echoReturn;
 
-            // 1. INPUT
+            // 0. ECHO RETURN — receive from feedback loop (re-transmission)
+            echoReturn = LocalIn.ar(1);
+
+            // 1. INPUT + echo return injection (before modulator)
             input = SoundIn.ar(0) * input_trim;
+            input = input + (echoReturn * ech_rt_wet);
 
             // 2. PRE-MOD SATURATION
             input = (input * (1 + saturation * 4.0)).tanh *
@@ -217,10 +220,9 @@ Engine_Transmissor : CroneEngine {
             rfChorus = rfChorus + (DelayC.ar(rf, 0.03, SinOsc.kr(cho_rate * 0.73).range(0.003, 0.003 + cho_depth * 0.5)) * cho_wet * 0.2);
             rf = Select.ar(cho_wet > 0.001, [ rf, rfChorus ]);
 
-            // KEY CLICK — Simple gate: key_gate is 0 or 1
-            // CombL for texture, gate opens/closes instantly
-            clickComb = CombL.ar(rf, 0.008, 1.0 / 146, 0.5);
-            rf = rf + (clickComb * key_click * 0.1 * key_gate);
+            // KEY CLICK — Same structure as FX Comb (freq=160, fb=0.64→5.12)
+            clickComb = CombL.ar(rf, 0.5, 1.0 / 160, 5.12);
+            rf = rf + (clickComb * key_click * key_gate);
 
             // FX Comb
             rfComb = Select.ar(com_wet > 0.001, [ rf, CombL.ar(rf, 0.5, 1.0 / com_freq.max(20), com_fb * 8.0) ]);
@@ -271,8 +273,12 @@ Engine_Transmissor : CroneEngine {
             // 21. BLEND (default 0.7 = always 30% dry audible)
             sig = (input * (1 - blend)) + (sig * blend);
 
-            // 22. OUTPUT
+            // 22. OUTPUT + ECHO RETURN FEEDBACK (radio echo)
             Out.ar(voiceBus, sig ! 2);
+            LocalOut.ar(Limiter.ar(
+                DelayL.ar(sig, 2.0, ech_rt_time.max(0.05)) * ech_rt_fb,
+                0.95
+            ));
 
         }.play(context.server, addAction: \addToHead);
 
@@ -319,7 +325,7 @@ Engine_Transmissor : CroneEngine {
         this.addCommand("set_floor", "f", { arg msg;
             floorVal = msg[1];
             noiseSynth.set(\vol, floorVal + (distanceVal * 0.15));
-            masterSynth.set(\ambientVol, (distanceVal * 0.4).max(floorVal * 0.5));
+            masterSynth.set(\ambientVol, (distanceVal * 0.4).max(floorVal * 0.18));
         });
         this.addCommand("set_hum_level", "f", { arg msg;
             humLevelVal = msg[1];
@@ -355,6 +361,11 @@ Engine_Transmissor : CroneEngine {
         this.addCommand("set_fbn_spread", "f", { arg msg; inputSynth.set(\fbn_spread, msg[1]); });
         this.addCommand("set_fbn_rate", "f", { arg msg; inputSynth.set(\fbn_rate, msg[1]); });
 
+        // ECHO RETURN (Radio Echo)
+        this.addCommand("set_ech_rt_wet", "f", { arg msg; inputSynth.set(\ech_rt_wet, msg[1]); });
+        this.addCommand("set_ech_rt_time", "f", { arg msg; inputSynth.set(\ech_rt_time, msg[1]); });
+        this.addCommand("set_ech_rt_fb", "f", { arg msg; inputSynth.set(\ech_rt_fb, msg[1]); });
+
         // AMBIENT SYNTH CONTROLS
         this.addCommand("set_carrier_vol", "f", { arg msg; carrierSynth.set(\vol, msg[1]); });
         this.addCommand("set_carrier_freq", "f", { arg msg; carrierSynth.set(\freq, msg[1]); });
@@ -374,7 +385,7 @@ Engine_Transmissor : CroneEngine {
             noiseSynth.set(\vol, floorVal + (d * 0.15));
             noiseSynth.set(\popRate, d * 4.0 + 0.3);
             masterSynth.set(\bandwidth, (4000 - (d * 2500)).max(1500));
-            masterSynth.set(\ambientVol, (d * 0.4).max(floorVal * 0.5));
+            masterSynth.set(\ambientVol, (d * 0.4).max(floorVal * 0.18));
         });
 
         // KILL TRAIL
