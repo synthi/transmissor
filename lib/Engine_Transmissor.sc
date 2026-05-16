@@ -106,47 +106,45 @@ Engine_Transmissor : CroneEngine {
             var detuneSmooth, detuneAtten;
             var meteorTrigger, cosmicPing;
             var sigEnv, noiseFloor, eTrig, eEnv, ditherSig;
-            var pttGate, clickOnTrig, clickOffTrig;
+            var clickOnTrig, clickOffTrig, clickBus;
             var clickPop, clickThump, clickChirp, clickTail;
 
             // 1. INPUT
             input = SoundIn.ar(0) * input_trim;
 
-            // 2. PTT KEY CLICK — realistic radio gate with organic transients
-            // key_click = effect level (0=clean gate, 1=full vintage character)
-            // Lua triggers: trigger_ptt_on / trigger_ptt_off / set_ptt_gate
-            pttGate = \ptt_gate.kr(0);
+            // 2. PTT KEY CLICK — additive radio transients (NO gate on input!)
+            // key_click = effect level (0=silent, 1=full vintage character)
+            // Lua triggers: trigger_ptt_on / trigger_ptt_off
             clickOnTrig = \t_ptt_on.tr(0);
             clickOffTrig = \t_ptt_off.tr(0);
 
             // HOT SWITCH POP — 2ms dry relay crack
             clickPop = HPF.ar(WhiteNoise.ar(1.0), 3000)
-                * EnvGen.ar(Env.perc(0.0001, 0.002), clickOnTrig)
-                * key_click * 0.8;
+                * EnvGen.ar(Env.perc(0.0005, 0.002), clickOnTrig)
+                * key_click * 1.5;
 
             // THUMP — low freq mechanical transient (relay impact)
             clickThump = (
                 SinOsc.ar(LFNoise1.kr(0.3).range(60, 100)) * 0.5 +
                 BPF.ar(WhiteNoise.ar(1.0), 150, 2.0) * 0.5
             ) * EnvGen.ar(Env.perc(0.0005, 0.015), clickOnTrig)
-              * key_click * 1.2;
+              * key_click * 2.0;
 
             // CHIRP — RF oscillator startup instability (audio domain)
-            clickChirp = SinOsc.ar(XLine.kr(3000, 800, 0.025))
-                * EnvGen.ar(Env.perc(0.001, 0.025), clickOnTrig)
-                * key_click * 0.6;
+            clickChirp = SinOsc.ar(
+                EnvGen.ar(Env([3000, 800], [0.025], \exp), clickOnTrig)
+            ) * EnvGen.ar(Env.perc(0.001, 0.025), clickOnTrig)
+              * key_click * 1.2;
 
             // SQUELCH TAIL — noise burst on PTT release
             clickTail = BPF.ar(WhiteNoise.ar(1.0),
                 LFNoise1.kr(0.2).range(800, 2000), 0.8)
                 * EnvGen.ar(Env.perc(0.005, LFNoise1.kr(0.1).range(0.08, 0.2)), clickOffTrig)
-                * key_click * 0.8;
+                * key_click * 1.5;
 
-            // Apply gate with organic ASR envelope
-            input = input * EnvGen.ar(Env.asr(0.001, 1, 0.003), pttGate > 0.5);
-
-            // Mix click artifacts into signal pre-modulation
-            input = input + clickPop + clickThump + clickChirp;
+            // Mix click artifacts into signal pre-modulation (soft clipped)
+            clickBus = (clickPop + clickThump + clickChirp).clip2(0.95);
+            input = input + clickBus;
 
             // 3. PRE-MOD SATURATION
             input = (input * (1 + saturation * 4.0)).tanh *
@@ -306,7 +304,6 @@ Engine_Transmissor : CroneEngine {
         this.addCommand("set_saturation", "f", { arg msg; inputSynth.set(\saturation, msg[1]); });
         this.addCommand("set_harmonic_drive", "f", { arg msg; inputSynth.set(\harmonic_drive, msg[1]); });
         this.addCommand("set_key_click", "f", { arg msg; inputSynth.set(\key_click, msg[1]); });
-        this.addCommand("set_ptt_gate", "f", { arg msg; inputSynth.set(\ptt_gate, msg[1]); });
         this.addCommand("trigger_ptt_on", "", { arg msg; inputSynth.set(\t_ptt_on, 1); });
         this.addCommand("trigger_ptt_off", "", { arg msg; inputSynth.set(\t_ptt_off, 1); });
         this.addCommand("set_multipath", "f", { arg msg; inputSynth.set(\multipath, msg[1]); });

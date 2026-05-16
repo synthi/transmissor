@@ -314,15 +314,13 @@ function grid_key(x, y, z)
       return
     end
 
-    -- PTT (col 1) — momentary: press=gate on+click, release=gate off+squelch
+    -- PTT (col 1) — momentary: press=click on, release=click off+squelch
     if x == 1 then
       _G.ptt_active = (z == 1)
       if z == 1 then
-        engine.set_ptt_gate(1)
         engine.trigger_ptt_on()
       else
         engine.trigger_ptt_off()
-        engine.set_ptt_gate(0)
       end
       return
     end
