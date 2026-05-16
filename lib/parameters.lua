@@ -36,8 +36,8 @@ local pages = {
     shift = { "saturation", "harmonic_drive", "key_click" }
   },
   [2] = { name = "AIR",
-    main = { "multipath", "doppler", "fade_rate" },
-    shift = { "fade_depth", "smear", "link_quality" }
+    main = { "multipath", "fade_rate", "fade_depth" },
+    shift = { "doppler", "smear", "link_quality" }
   },
   [3] = { name = "NOISE",
     main = { "atmos", "space_hum", "whistle" },
@@ -56,16 +56,16 @@ local pages = {
     shift = { "fbn_wet", "fbn_spread", "fbn_rate" }
   },
   [7] = { name = "RX",
-    main = { "detune", "rx_drift", "agc_rate" },
-    shift = { "agc_breath", "rx_bw", "adc_depth" }
+    main = { "detune", "rx_drift", "rx_bw" },
+    shift = { "agc_rate", "agc_breath", "adc_depth" }
   },
   [8] = { name = "MIX",
     main = { "input_trim", "blend", "floor" },
     shift = { "hum_level", "distance", nil }
   },
   [9] = { name = "EQ",
-    main = { "locut", "hicut", "rx_bw" },
-    shift = { "rx_hpf", nil, nil }
+    main = { "locut", "hicut", "rx_hpf" },
+    shift = { nil, nil, nil }
   }
 }
 
@@ -91,8 +91,8 @@ function setup_parameters()
     cs(0, 1, 'lin', 0, 0))
   params:add_control("harmonic_drive", "Harmonics",
     cs(0, 1, 'lin', 0, 0))
-  params:add_control("key_click", "Key Click",
-    cs(0, 1, 'lin', 0, 0))
+  params:add_control("key_click", "PTT Click",
+    cs(0, 1, 'lin', 0, 0.5))
 
   params:add_separator("PROPAGATION")
 
@@ -333,7 +333,7 @@ end
 
 local fidelity_presets = {
   [1] = { name = "PRISTINE",
-    { "tx_freq", 4800 }, { "osc_jitter", 0.0 }, { "pilot_leak", 0 },
+    { "tx_freq", 8800 }, { "osc_jitter", 0.0 }, { "pilot_leak", 0 },
     { "saturation", 0 }, { "harmonic_drive", 0 }, { "key_click", 0 },
     { "multipath", 0.0 }, { "doppler", 0.0 }, { "fade_rate", 0.0 },
     { "fade_depth", 0.0 }, { "smear", 0.0 }, { "link_quality", 1.0 },
@@ -342,7 +342,7 @@ local fidelity_presets = {
     { "floor", 0.02 }, { "locut", 80 }, { "hicut", 4000 }, { "rx_hpf", 60 }
   },
   [2] = { name = "CLEAN",
-    { "tx_freq", 4800 }, { "osc_jitter", 0.02 }, { "pilot_leak", 0.01 },
+    { "tx_freq", 7800 }, { "osc_jitter", 0.02 }, { "pilot_leak", 0.01 },
     { "saturation", 0.01 }, { "harmonic_drive", 0.01 }, { "key_click", 0 },
     { "multipath", 0.02 }, { "doppler", 0.1 }, { "fade_rate", 0.05 },
     { "fade_depth", 0.05 }, { "smear", 0.02 }, { "link_quality", 0.98 },
@@ -351,7 +351,7 @@ local fidelity_presets = {
     { "floor", 0.02 }, { "locut", 130 }, { "hicut", 3800 }, { "rx_hpf", 70 }
   },
   [3] = { name = "GOOD",
-    { "tx_freq", 4800 }, { "osc_jitter", 0.05 }, { "pilot_leak", 0.02 },
+    { "tx_freq", 6800 }, { "osc_jitter", 0.05 }, { "pilot_leak", 0.02 },
     { "saturation", 0.02 }, { "harmonic_drive", 0.02 }, { "key_click", 0 },
     { "multipath", 0.05 }, { "doppler", 0.3 }, { "fade_rate", 0.1 },
     { "fade_depth", 0.1 }, { "smear", 0.05 }, { "link_quality", 0.95 },
@@ -360,7 +360,7 @@ local fidelity_presets = {
     { "floor", 0.02 }, { "locut", 180 }, { "hicut", 3500 }, { "rx_hpf", 85 }
   },
   [4] = { name = "FAIR",
-    { "tx_freq", 4800 }, { "osc_jitter", 0.08 }, { "pilot_leak", 0.03 },
+    { "tx_freq", 6000 }, { "osc_jitter", 0.08 }, { "pilot_leak", 0.03 },
     { "saturation", 0.03 }, { "harmonic_drive", 0.04 }, { "key_click", 0 },
     { "multipath", 0.1 }, { "doppler", 0.6 }, { "fade_rate", 0.15 },
     { "fade_depth", 0.2 }, { "smear", 0.08 }, { "link_quality", 0.90 },
@@ -369,7 +369,7 @@ local fidelity_presets = {
     { "floor", 0.03 }, { "locut", 230 }, { "hicut", 3200 }, { "rx_hpf", 100 }
   },
   [5] = { name = "AVERAGE",
-    { "tx_freq", 4800 }, { "osc_jitter", 0.12 }, { "pilot_leak", 0.05 },
+    { "tx_freq", 5400 }, { "osc_jitter", 0.12 }, { "pilot_leak", 0.05 },
     { "saturation", 0.05 }, { "harmonic_drive", 0.06 }, { "key_click", 0 },
     { "multipath", 0.15 }, { "doppler", 1.0 }, { "fade_rate", 0.2 },
     { "fade_depth", 0.3 }, { "smear", 0.12 }, { "link_quality", 0.85 },
@@ -387,7 +387,7 @@ local fidelity_presets = {
     { "floor", 0.08 }, { "locut", 330 }, { "hicut", 2500 }, { "rx_hpf", 145 }
   },
   [7] = { name = "BAD",
-    { "tx_freq", 4800 }, { "osc_jitter", 0.25 }, { "pilot_leak", 0.1 },
+    { "tx_freq", 4500 }, { "osc_jitter", 0.25 }, { "pilot_leak", 0.1 },
     { "saturation", 0.1 }, { "harmonic_drive", 0.12 }, { "key_click", 0 },
     { "multipath", 0.35 }, { "doppler", 3.0 }, { "fade_rate", 0.4 },
     { "fade_depth", 0.6 }, { "smear", 0.25 }, { "link_quality", 0.65 },
@@ -396,7 +396,7 @@ local fidelity_presets = {
     { "floor", 0.12 }, { "locut", 380 }, { "hicut", 2200 }, { "rx_hpf", 170 }
   },
   [8] = { name = "DEGRADED",
-    { "tx_freq", 4800 }, { "osc_jitter", 0.35 }, { "pilot_leak", 0.15 },
+    { "tx_freq", 4300 }, { "osc_jitter", 0.35 }, { "pilot_leak", 0.15 },
     { "saturation", 0.15 }, { "harmonic_drive", 0.18 }, { "key_click", 0 },
     { "multipath", 0.5 }, { "doppler", 5.0 }, { "fade_rate", 0.5 },
     { "fade_depth", 0.75 }, { "smear", 0.35 }, { "link_quality", 0.50 },
@@ -405,7 +405,7 @@ local fidelity_presets = {
     { "floor", 0.18 }, { "locut", 430 }, { "hicut", 2000 }, { "rx_hpf", 195 }
   },
   [9] = { name = "FRINGE",
-    { "tx_freq", 4800 }, { "osc_jitter", 0.5 }, { "pilot_leak", 0.2 },
+    { "tx_freq", 4100 }, { "osc_jitter", 0.5 }, { "pilot_leak", 0.2 },
     { "saturation", 0.2 }, { "harmonic_drive", 0.25 }, { "key_click", 0.2 },
     { "multipath", 0.75 }, { "doppler", 12.0 }, { "fade_rate", 0.75 },
     { "fade_depth", 0.85 }, { "smear", 0.5 }, { "link_quality", 0.2 },
@@ -414,7 +414,7 @@ local fidelity_presets = {
     { "floor", 0.3 }, { "locut", 480 }, { "hicut", 1800 }, { "rx_hpf", 215 }
   },
   [10] = { name = "VOID",
-    { "tx_freq", 4800 }, { "osc_jitter", 0.6 }, { "pilot_leak", 0.3 },
+    { "tx_freq", 3950 }, { "osc_jitter", 0.6 }, { "pilot_leak", 0.3 },
     { "saturation", 0.3 }, { "harmonic_drive", 0.35 }, { "key_click", 0.3 },
     { "multipath", 0.85 }, { "doppler", 16.0 }, { "fade_rate", 0.85 },
     { "fade_depth", 0.95 }, { "smear", 0.6 }, { "link_quality", 0.1 },
@@ -423,7 +423,7 @@ local fidelity_presets = {
     { "floor", 0.35 }, { "locut", 530 }, { "hicut", 1600 }, { "rx_hpf", 230 }
   },
   [11] = { name = "XTINA",
-    { "tx_freq", 4800 }, { "osc_jitter", 0.7 }, { "pilot_leak", 0.4 },
+    { "tx_freq", 3800 }, { "osc_jitter", 0.7 }, { "pilot_leak", 0.4 },
     { "saturation", 0.4 }, { "harmonic_drive", 0.4 }, { "key_click", 0.35 },
     { "multipath", 0.9 }, { "doppler", 18.0 }, { "fade_rate", 0.9 },
     { "fade_depth", 0.95 }, { "smear", 0.65 }, { "link_quality", 0.08 },
@@ -432,7 +432,7 @@ local fidelity_presets = {
     { "floor", 0.4 }, { "locut", 580 }, { "hicut", 1400 }, { "rx_hpf", 240 }
   },
   [12] = { name = "XBAJA",
-    { "tx_freq", 4800 }, { "osc_jitter", 0.8 }, { "pilot_leak", 0.5 },
+    { "tx_freq", 3650 }, { "osc_jitter", 0.8 }, { "pilot_leak", 0.5 },
     { "saturation", 0.5 }, { "harmonic_drive", 0.5 }, { "key_click", 0.4 },
     { "multipath", 0.92 }, { "doppler", 19.0 }, { "fade_rate", 0.92 },
     { "fade_depth", 0.98 }, { "smear", 0.7 }, { "link_quality", 0.05 },
@@ -441,7 +441,7 @@ local fidelity_presets = {
     { "floor", 0.45 }, { "locut", 630 }, { "hicut", 1200 }, { "rx_hpf", 250 }
   },
   [13] = { name = "XFRINGE",
-    { "tx_freq", 4800 }, { "osc_jitter", 0.85 }, { "pilot_leak", 0.6 },
+    { "tx_freq", 3500 }, { "osc_jitter", 0.85 }, { "pilot_leak", 0.6 },
     { "saturation", 0.6 }, { "harmonic_drive", 0.6 }, { "key_click", 0.45 },
     { "multipath", 0.95 }, { "doppler", 19.5 }, { "fade_rate", 0.95 },
     { "fade_depth", 0.99 }, { "smear", 0.75 }, { "link_quality", 0.03 },
@@ -450,7 +450,7 @@ local fidelity_presets = {
     { "floor", 0.5 }, { "locut", 680 }, { "hicut", 1000 }, { "rx_hpf", 260 }
   },
   [14] = { name = "XVOID",
-    { "tx_freq", 4800 }, { "osc_jitter", 0.9 }, { "pilot_leak", 0.7 },
+    { "tx_freq", 3400 }, { "osc_jitter", 0.9 }, { "pilot_leak", 0.7 },
     { "saturation", 0.7 }, { "harmonic_drive", 0.7 }, { "key_click", 0.5 },
     { "multipath", 0.97 }, { "doppler", 20.0 }, { "fade_rate", 0.97 },
     { "fade_depth", 0.99 }, { "smear", 0.8 }, { "link_quality", 0.02 },
@@ -459,7 +459,7 @@ local fidelity_presets = {
     { "floor", 0.55 }, { "locut", 730 }, { "hicut", 900 }, { "rx_hpf", 275 }
   },
   [15] = { name = "EDGE",
-    { "tx_freq", 6000 }, { "osc_jitter", 0.95 }, { "pilot_leak", 0.8 },
+    { "tx_freq", 3300 }, { "osc_jitter", 0.95 }, { "pilot_leak", 0.8 },
     { "saturation", 0.8 }, { "harmonic_drive", 0.8 }, { "key_click", 0.55 },
     { "multipath", 0.98 }, { "doppler", 20.0 }, { "fade_rate", 0.98 },
     { "fade_depth", 1.0 }, { "smear", 0.85 }, { "link_quality", 0.01 },
@@ -468,7 +468,7 @@ local fidelity_presets = {
     { "floor", 0.6 }, { "locut", 776 }, { "hicut", 750 }, { "rx_hpf", 285 }
   },
   [16] = { name = "VOIDMAX",
-    { "tx_freq", 9000 }, { "osc_jitter", 1.0 }, { "pilot_leak", 1.0 },
+    { "tx_freq", 3200 }, { "osc_jitter", 1.0 }, { "pilot_leak", 1.0 },
     { "saturation", 1.0 }, { "harmonic_drive", 1.0 }, { "key_click", 0.6 },
     { "multipath", 1.0 }, { "doppler", 20.0 }, { "fade_rate", 1.0 },
     { "fade_depth", 1.0 }, { "smear", 1.0 }, { "link_quality", 0.0 },

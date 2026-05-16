@@ -83,7 +83,7 @@ Engine_Transmissor : CroneEngine {
         inputSynth = {
             arg
                 tx_freq = 4800, osc_jitter = 0.2, pilot_leak = 0.0,
-                saturation = 0.0, harmonic_drive = 0.0, key_click = 0.0,
+                saturation = 0.0, harmonic_drive = 0.0, key_click = 0.5,
                 multipath = 0.3, doppler = 3.0, fade_rate = 0.3,
                 fade_depth = 0.5, smear = 0.2, link_quality = 1.0,
                 atmos = 0.2, space_hum = 0.05, whistle = 0.0,
@@ -106,13 +106,47 @@ Engine_Transmissor : CroneEngine {
             var detuneSmooth, detuneAtten;
             var meteorTrigger, cosmicPing;
             var sigEnv, noiseFloor, eTrig, eEnv, ditherSig;
+            var pttGate, clickOnTrig, clickOffTrig;
+            var clickPop, clickThump, clickChirp, clickTail;
 
             // 1. INPUT
             input = SoundIn.ar(0) * input_trim;
 
-            // 2. KEY CLICK (crackle generator — NOT an input gate)
-            // Authentic telegraph key click: saturated noise burst
-            input = input + ((WhiteNoise.ar(1.0) * Dust.ar(key_click * 80)).tanh * 0.12);
+            // 2. PTT KEY CLICK — realistic radio gate with organic transients
+            // key_click = effect level (0=clean gate, 1=full vintage character)
+            // Lua triggers: trigger_ptt_on / trigger_ptt_off / set_ptt_gate
+            pttGate = \ptt_gate.kr(0);
+            clickOnTrig = \t_ptt_on.tr(0);
+            clickOffTrig = \t_ptt_off.tr(0);
+
+            // HOT SWITCH POP — 2ms dry relay crack
+            clickPop = HPF.ar(WhiteNoise.ar(1.0), 3000)
+                * EnvGen.ar(Env.perc(0.0001, 0.002), clickOnTrig)
+                * key_click * 0.8;
+
+            // THUMP — low freq mechanical transient (relay impact)
+            clickThump = (
+                SinOsc.ar(LFNoise1.kr(0.3).range(60, 100)) * 0.5 +
+                BPF.ar(WhiteNoise.ar(1.0), 150, 2.0) * 0.5
+            ) * EnvGen.ar(Env.perc(0.0005, 0.015), clickOnTrig)
+              * key_click * 1.2;
+
+            // CHIRP — RF oscillator startup instability (audio domain)
+            clickChirp = SinOsc.ar(XLine.kr(3000, 800, 0.025))
+                * EnvGen.ar(Env.perc(0.001, 0.025), clickOnTrig)
+                * key_click * 0.6;
+
+            // SQUELCH TAIL — noise burst on PTT release
+            clickTail = BPF.ar(WhiteNoise.ar(1.0),
+                LFNoise1.kr(0.2).range(800, 2000), 0.8)
+                * EnvGen.ar(Env.perc(0.005, LFNoise1.kr(0.1).range(0.08, 0.2)), clickOffTrig)
+                * key_click * 0.8;
+
+            // Apply gate with organic ASR envelope
+            input = input * EnvGen.ar(Env.asr(0.001, 1, 0.003), pttGate > 0.5);
+
+            // Mix click artifacts into signal pre-modulation
+            input = input + clickPop + clickThump + clickChirp;
 
             // 3. PRE-MOD SATURATION
             input = (input * (1 + saturation * 4.0)).tanh *
@@ -254,10 +288,13 @@ Engine_Transmissor : CroneEngine {
             sig = sig + (hum * 0.08 * (
                 SinOsc.ar(50) * 0.5 + SinOsc.ar(100) * 0.3 + SinOsc.ar(150) * 0.15));
 
-            // 23. BLEND
+            // 23. SQUELCH TAIL (post-demod receiver artifact)
+            sig = sig + clickTail;
+
+            // 24. BLEND
             sig = (input * (1 - blend)) + (sig * blend);
 
-            // 24. OUTPUT
+            // 25. OUTPUT
             Out.ar(voiceBus, sig ! 2);
 
         }.play(context.server, addAction: \addToHead);
@@ -269,6 +306,9 @@ Engine_Transmissor : CroneEngine {
         this.addCommand("set_saturation", "f", { arg msg; inputSynth.set(\saturation, msg[1]); });
         this.addCommand("set_harmonic_drive", "f", { arg msg; inputSynth.set(\harmonic_drive, msg[1]); });
         this.addCommand("set_key_click", "f", { arg msg; inputSynth.set(\key_click, msg[1]); });
+        this.addCommand("set_ptt_gate", "f", { arg msg; inputSynth.set(\ptt_gate, msg[1]); });
+        this.addCommand("trigger_ptt_on", "", { arg msg; inputSynth.set(\t_ptt_on, 1); });
+        this.addCommand("trigger_ptt_off", "", { arg msg; inputSynth.set(\t_ptt_off, 1); });
         this.addCommand("set_multipath", "f", { arg msg; inputSynth.set(\multipath, msg[1]); });
         this.addCommand("set_doppler", "f", { arg msg; inputSynth.set(\doppler, msg[1]); });
         this.addCommand("set_fade_rate", "f", { arg msg; inputSynth.set(\fade_rate, msg[1]); });

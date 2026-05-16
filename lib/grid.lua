@@ -1,9 +1,9 @@
 -- =========================================================
--- GRID — Transmissor v1.3.0
+-- GRID — Transmissor v1.4.0
 -- Rows 1-3: interactive param bars (tap/hold ramp) + seq recording
 -- Rows 4-5: Fidelity/Interference presets + seq recording
 -- Row 6: empty
--- Row 7: User Presets (1-10) + Sequencers (11-14)
+-- Row 7: User Presets (1-10) + Gap (11) + Sequencers (12-15)
 -- Row 8: Controls
 -- =========================================================
 
@@ -55,6 +55,7 @@ local ALL_PARAMS = {
 -- =========================================================
 
 local press_time = {}  -- [y] = clock time
+local page_press_time = 0
 
 local ramp_state = {
   [1] = { active = false, param = nil, start_val = 0, target_val = 0,
@@ -86,7 +87,7 @@ local function start_ramp(row, param_name, target_norm, hold_time)
     start_val = current_val,
     target_val = target_val,
     start_time = util.time(),
-    duration = math.max(0.1, hold_time * 2.0)
+    duration = math.max(0.1, hold_time * 2.6)
   }
 end
 
@@ -97,9 +98,8 @@ local function process_ramps()
     if rs.active then
       local elapsed = now - rs.start_time
       local progress = math.min(1.0, elapsed / rs.duration)
-      local eased = progress < 0.5
-        and (2 * progress * progress)
-        or (1 - ((-2 * progress + 2) ^ 2) / 2)
+      -- cubic ease-out: starts fast, decelerates smoothly
+      local eased = 1 - ((1 - progress) ^ 3)
       local val = rs.start_val + (rs.target_val - rs.start_val) * eased
       params:set(rs.param, val)
       if progress >= 1.0 then
@@ -175,8 +175,10 @@ local seq_press_time = {}
 local function is_recordable(x, y)
   -- Don't record: row 8 (controls)
   if y == 8 then return false end
-  -- Don't record: row 7 cols 11-14 (sequencer buttons themselves)
-  if y == 7 and x >= 11 and x <= 14 then return false end
+  -- Don't record: row 7 cols 12-15 (sequencer buttons themselves)
+  if y == 7 and x >= 12 and x <= 15 then return false end
+  -- Don't record: row 7 col 11 (gap)
+  if y == 7 and x == 11 then return false end
   -- Don't record: row 6 (empty)
   if y == 6 then return false end
   -- YES: rows 1-3 (params, page-aware), row 4 (fidelity), row 5 (interference),
@@ -297,22 +299,31 @@ function grid_key(x, y, z)
       return
     end
 
-    -- PAGE BUTTONS — press = change page + shift, release = shift off
+    -- PAGE BUTTONS — press = change page, hold >150ms on release = toggle shift
     if is_page_col(x) then
       if z == 1 then
         _G.current_page = page_cols[x]
         _G.distance_mode = false
-        _G.shift_active = true
+        page_press_time = util.time()
       else
-        _G.shift_active = false
+        local hold = util.time() - page_press_time
+        if hold > 0.15 then
+          _G.shift_active = not _G.shift_active
+        end
       end
       return
     end
 
-    -- PTT (col 1) — toggle
-    if x == 1 and z == 1 then
-      _G.ptt_active = not _G.ptt_active
-      params:set("key_click", _G.ptt_active and 1 or 0)
+    -- PTT (col 1) — momentary: press=gate on+click, release=gate off+squelch
+    if x == 1 then
+      _G.ptt_active = (z == 1)
+      if z == 1 then
+        engine.set_ptt_gate(1)
+        engine.trigger_ptt_on()
+      else
+        engine.trigger_ptt_off()
+        engine.set_ptt_gate(0)
+      end
       return
     end
 
@@ -325,7 +336,7 @@ function grid_key(x, y, z)
     return
   end
 
-  -- ROW 7: USER PRESETS (1-10) + SEQUENCERS (11-14)
+  -- ROW 7: USER PRESETS (1-10) + GAP (11) + SEQUENCERS (12-15)
   if y == 7 then
     local now = util.time()
 
@@ -333,6 +344,9 @@ function grid_key(x, y, z)
     if x >= 1 and x <= 10 then
       local slot = x
       local sa = _G.shift_active or false
+
+      -- Record for sequencers
+      record_event(x, y, z)
 
       if sa then
         -- Shift + button = clear preset
@@ -370,9 +384,12 @@ function grid_key(x, y, z)
       return
     end
 
-    -- SEQUENCERS (cols 11-14)
-    if x >= 11 and x <= 14 then
-      local slot = x - 10  -- 1-4
+    -- GAP (col 11)
+    if x == 11 then return end
+
+    -- SEQUENCERS (cols 12-15)
+    if x >= 12 and x <= 15 then
+      local slot = x - 11  -- 1-4
       local sa = _G.shift_active or false
 
       if sa then
@@ -514,7 +531,7 @@ local function render_preset_row(row, current_val)
 end
 
 -- =========================================================
--- RENDER ROW 7: User Presets + Sequencers
+-- RENDER ROW 7: User Presets + Gap + Sequencers
 -- =========================================================
 
 local function render_row7()
@@ -534,11 +551,12 @@ local function render_row7()
     grid_set_led(x, 7, b)
   end
 
-  -- Separator (col 10 is last preset, no gap needed — sequencers start at 11)
+  -- Gap (col 11)
+  grid_set_led(11, 7, 0)
 
-  -- Sequencers (cols 11-14)
+  -- Sequencers (cols 12-15)
   for i = 1, 4 do
-    local x = i + 10
+    local x = i + 11
     local seq = _G.seq_slots[i]
     local ss = seq and seq.state or 0
     local b = 1  -- Empty
@@ -625,11 +643,11 @@ function grid_redraw()
     -- ROW 6: empty
     for x = 1, 16 do grid_set_led(x, 6, 0) end
 
-    -- ROW 7: User Presets + Sequencers
+    -- ROW 7: User Presets + Gap + Sequencers
     render_row7()
 
     -- ROW 8: Controls
-    -- Col 1: PTT toggle (2=off, 11=on)
+    -- Col 1: PTT momentary (2=off, 11=on)
     grid_set_led(1, 8, _G.ptt_active and 11 or 2)
     -- Cols 2-3: empty
     grid_set_led(2, 8, 0); grid_set_led(3, 8, 0)
@@ -697,7 +715,7 @@ function init_grid()
   end
   _G.seq_active = false
 
-  print("[Transmissor] Grid connected (v1.3.0)")
+  print("[Transmissor] Grid connected (v1.4.0)")
 end
 
 function grid_cleanup()
