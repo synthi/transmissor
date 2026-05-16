@@ -189,14 +189,16 @@ function init()
     if grid_redraw then grid_redraw() end
   end, 1/25):start()
 
-  -- Screen redraw at 15fps (Fixed non-blocking loop)
+  -- Screen redraw at 15fps — DIRECT DIAGNOSTIC TEST
+  -- Bypassing redraw() completely to test if metro + screen work
   metro.init(function()
-    if redraw then
-      local ok, err = pcall(redraw)
-      if not ok then
-        print("[Transmissor] UI ERROR: " .. tostring(err))
-      end
-    end
+    print("[Transmissor] METRO TICK")
+    screen.clear()
+    screen.level(15)
+    screen.move(10, 30)
+    screen.text("DIRECT TEST")
+    screen.update()
+    print("[Transmissor] METRO TICK DONE")
   end, 1/15):start()
 
   params:bang()
