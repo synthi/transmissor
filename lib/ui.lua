@@ -1,27 +1,16 @@
 -- =========================================================
--- UI — Transmissor v1.0.8
--- OLED redraw — guaranteed screen.update() + debug
+-- UI — Transmissor v1.1.0
+-- OLED redraw — guaranteed screen.update()
 -- =========================================================
 
-local redraw_count = 0
-
 function ui_redraw()
-  redraw_count = redraw_count + 1
-
-  -- Debug: first 5 frames
-  if redraw_count <= 5 then
-    print("[TRMS UI] redraw #" .. redraw_count ..
-      " pages=" .. tostring(pages ~= nil) ..
-      " ui_redraw=OK")
-  end
-
   screen.clear()
 
   -- Defensive: verify pages exists
   if not pages then
     screen.level(15)
     screen.move(0, 20)
-    screen.text("ERR: pages=nil #" .. redraw_count)
+    screen.text("ERR: pages=nil")
     screen.update()
     return
   end
@@ -105,14 +94,10 @@ function ui_redraw()
   end)
 
   if not ok then
-    -- Show error on screen so user can see what failed
     screen.level(15)
     screen.move(0, 30)
     screen.text("UI:" .. tostring(err):sub(1, 20))
-    -- Debug: only print first 3 errors
-    if redraw_count < 4 then
-      print("[Transmissor] ui_redraw error #" .. redraw_count .. ": " .. tostring(err))
-    end
+    print("[Transmissor] ui_redraw error: " .. tostring(err))
   end
 
   -- GUARANTEED screen.update — ALWAYS runs

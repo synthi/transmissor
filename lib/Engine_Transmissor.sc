@@ -1,4 +1,4 @@
-// Engine_Transmissor.sc — Transmissor v1.0.7
+// Engine_Transmissor.sc — Transmissor v1.1.0
 // Shortwave SSB transmission simulator engine for norns
 // Audio input → SSB modulation → RF effects → SSB demodulation → output
 //

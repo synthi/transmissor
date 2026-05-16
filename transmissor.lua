@@ -1,12 +1,20 @@
--- Transmissor v1.0.6
+-- Transmissor v1.1.0
 -- Shortwave SSB transmission simulator
 -- Audio input → SSB modulation → RF effects → SSB demodulation → output
 -- Based on concepts from EdgeField but completely rewritten for norns
 --
 -- Changelog:
---   v1.0.3  Fix LFO corrupting tx_freq (carrier LFO only modulates ambient synth)
---           Reduced carrier ambient synth volume to prevent 4800Hz tone
---           input_trim default → 1.0 (unity gain)
+--   v1.1.0  FIX CRITICAL: display congelado
+--           Causa: norns 240102+ no llama redraw() automaticamente
+--           Solucion: redraw_metro dedicado a 15fps
+--           Engine: dst_tone aplica LPF a distorsion
+--           Phase noise: PinkNoise LPF a 50Hz
+--           AGC: ataque 2ms, SNR envelope-modulado
+--           Auroral: flutter 20-80Hz
+--           Multipath: .max(0.1) eliminado
+--           Grid: page buttons instantaneos (momentary shift)
+--           Presets: 16 fidelidad + 16 interferencia
+--   v1.0.3  Fix LFO corrupting tx_freq
 --   v1.0.2  FreShift → FreqShift
 --   v1.0.1  CosOsc → SinOsc(pi/2)
 --   v1.0    Initial release
@@ -164,7 +172,6 @@ end
 -- =========================================================
 
 function redraw()
-  print("[TRMS] redraw() called t=" .. os.clock())
   if _G.ui_redraw then
     _G.ui_redraw()
   end
@@ -175,19 +182,9 @@ end
 -- =========================================================
 
 function init()
-  print("[Transmissor] Loading modules...")
-
-  print("[Transmissor] Loading parameters...")
   load_module("parameters")
-  print("[Transmissor] Loading grid...")
   load_module("grid")
-  print("[Transmissor] Loading ui...")
   load_module("ui")
-
-  -- Verify redraw exists
-  print("[Transmissor] redraw = " .. tostring(redraw))
-  print("[Transmissor] grid_redraw = " .. tostring(grid_redraw))
-  print("[Transmissor] setup_parameters = " .. tostring(setup_parameters))
 
   -- Setup all parameters
   if setup_parameters then setup_parameters() end
