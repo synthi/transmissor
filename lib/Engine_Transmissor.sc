@@ -1,4 +1,4 @@
-// Engine_Transmissor.sc — Transmissor v1.0.4
+// Engine_Transmissor.sc — Transmissor v1.0.5
 // Shortwave SSB transmission simulator engine for norns
 // Audio input → SSB modulation → RF effects → SSB demodulation → output
 //
@@ -162,6 +162,7 @@ Engine_Transmissor : CroneEngine {
             var demod, sig, compSig, agcKey;
             var tapDelay, tapGain, harmonicSig;
             var rfReverb, rfEcho, rfChorus, rfComb, rfDist, rfFBank;
+            var detuneSmooth, detuneAtten;
 
             // 1. INPUT — SoundIn.ar(0) lee hardware input (bus 2 interno en norns)
             // In.ar(0) seria el OUTPUT bus, no el input!
@@ -327,13 +328,21 @@ Engine_Transmissor : CroneEngine {
                 (WhiteNoise.ar(1.0) * (1.0 - link_quality) * 0.1);
 
             // 19. SSB DEMODULATOR
-            // Demodular: multiplicar RF por coseno de portadora local
+            // Demodular con portadora local (solo rx_drift, NO detune)
+            // Makeup gain ×3 compensa la pérdida de 6dB del producto-demod
             demod = rf * SinOsc.ar(
-                tx_freq + detune +
+                tx_freq +
                 (rx_drift * LFNoise1.kr(0.05).range(-5, 5)),
                 pi/2
             );
-            demod = LPF.ar(demod, 4000);
+            demod = LPF.ar(demod, 4000) * 3.0;  // IF makeup gain
+
+            // 19b. DETUNE = pitch shift en audio demodulado (no tremolo)
+            // En SSB real, un offset de portadora desplaza el pitch del audio
+            detuneSmooth = detune.lag(0.05);
+            detuneAtten = 1.0 - (detuneSmooth.abs / 50.0).min(0.9);
+            demod = FreqShift.ar(demod, detuneSmooth.neg);
+            demod = demod * detuneAtten;
 
             // 20. ADC QUANTIZATION
             sig = demod.round(2.0 / pow(2, adc_depth));
