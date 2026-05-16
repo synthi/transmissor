@@ -1,4 +1,4 @@
-// Engine_Transmissor.sc — Transmissor v1.0.5
+// Engine_Transmissor.sc — Transmissor v1.0.6
 // Shortwave SSB transmission simulator engine for norns
 // Audio input → SSB modulation → RF effects → SSB demodulation → output
 //
@@ -335,7 +335,7 @@ Engine_Transmissor : CroneEngine {
                 (rx_drift * LFNoise1.kr(0.05).range(-5, 5)),
                 pi/2
             );
-            demod = LPF.ar(demod, 4000) * 3.0;  // IF makeup gain
+            demod = LPF.ar(demod, 4000);  // Clean IF, no makeup gain here to prevent ADC clipping
 
             // 19b. DETUNE = pitch shift en audio demodulado (no tremolo)
             // En SSB real, un offset de portadora desplaza el pitch del audio
@@ -347,14 +347,22 @@ Engine_Transmissor : CroneEngine {
             // 20. ADC QUANTIZATION
             sig = demod.round(2.0 / pow(2, adc_depth));
 
-            // 21. AGC — Compander: boost señales bajas, comprime señales altas
-            agcKey = sig.abs.max(0.001);
+            // 21. AGC — True Shortwave Downward Compressor + Makeup Gain
+            agcKey = sig.abs;
             compSig = Compander.ar(sig, agcKey,
-                0.3,                              // threshold
-                1 + (agc_breath * 4),             // slopeBelow > 1 = BOOST quietas
-                1 / (1 + (agc_breath * 2)),       // slopeAbove < 1 = COMPRESS altas
-                agc_rate * 0.1, agc_rate * 0.01);
-            sig = LeakDC.ar(compSig);
+                0.02,                              // Low threshold (reacts to almost everything)
+                1.0,                               // Linear below threshold
+                0.2,                               // 5:1 Compression above threshold (ducking/pumping)
+                0.01,                              // Fast attack (instant duck on static pops)
+                agc_rate.max(0.05)                 // Variable release (pumping recovery speed)
+            );
+
+            // Massive makeup gain to bring compressed noise floor up to nominal level.
+            // agc_breath increases makeup gain, making pumping effect more violent.
+            sig = LeakDC.ar(compSig) * (10.0 + (agc_breath * 15.0));
+
+            // Analog saturation to prevent digital clipping from massive makeup gain
+            sig = sig.tanh;
 
             // 22. RX BANDWIDTH
             sig = HPF.ar(sig, 100);

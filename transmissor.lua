@@ -1,4 +1,4 @@
--- Transmissor v1.0.5
+-- Transmissor v1.0.6
 -- Shortwave SSB transmission simulator
 -- Audio input → SSB modulation → RF effects → SSB demodulation → output
 -- Based on concepts from EdgeField but completely rewritten for norns
@@ -189,36 +189,13 @@ function init()
     if grid_redraw then grid_redraw() end
   end, 1/25):start()
 
-  -- Screen redraw at 15fps
-  -- Si redraw falla, usar fallback de diagnóstico
-  local screen_ok = false
+  -- Screen redraw at 15fps (Fixed non-blocking loop)
   metro.init(function()
-    if redraw and not screen_ok then
+    if redraw then
       local ok, err = pcall(redraw)
-      if ok then
-        screen_ok = true
-      else
+      if not ok then
         print("[Transmissor] UI ERROR: " .. tostring(err))
-        -- Fallback: dibujar algo minimal para confirmar que la pantalla funciona
-        screen.clear()
-        screen.level(15)
-        screen.move(10, 30)
-        screen.text("TRMS v1.0.5")
-        screen.move(10, 45)
-        screen.text("UI ERR: " .. tostring(err):sub(1, 20))
-        screen.update()
       end
-    elseif not redraw then
-      -- redraw nunca se cargó — dibujar diagnóstico
-      screen.clear()
-      screen.level(15)
-      screen.move(10, 20)
-      screen.text("TRMS v1.0.5")
-      screen.move(10, 35)
-      screen.text("NO REDRAW FN!")
-      screen.move(10, 50)
-      screen.text("Check matron log")
-      screen.update()
     end
   end, 1/15):start()
 
