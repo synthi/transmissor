@@ -142,7 +142,7 @@ function setup_parameters()
   params:add_control("blend", "Dry/Wet",
     cs(0, 1, 'lin', 0, 1))
   params:add_control("floor", "Noise Floor",
-    cs(0, 1, 'lin', 0, 0.3))
+    cs(0, 1, 'lin', 0, 0.02))
   params:add_control("hum_level", "Carrier Vol",
     cs(0, 0.2, 'lin', 0, 0.05))
   params:add_control("distance", "Distance",
@@ -320,7 +320,8 @@ local fidelity_presets = {
     { "multipath", 0.05 }, { "doppler", 0.5 }, { "fade_rate", 0.1 },
     { "fade_depth", 0.1 }, { "smear", 0.05 }, { "link_quality", 0.95 },
     { "detune", 0 }, { "rx_drift", 0.02 }, { "agc_rate", 0.3 },
-    { "agc_breath", 0.05 }, { "rx_bw", 3000 }, { "adc_depth", 16 }
+    { "agc_breath", 0.05 }, { "rx_bw", 3000 }, { "adc_depth", 16 },
+    { "floor", 0.02 }
   },
   [2] = { name = "CLEAN",
     { "tx_freq", 4800 }, { "osc_jitter", 0.08 }, { "pilot_leak", 0.01 },
@@ -328,7 +329,8 @@ local fidelity_presets = {
     { "multipath", 0.1 }, { "doppler", 1.0 }, { "fade_rate", 0.15 },
     { "fade_depth", 0.15 }, { "smear", 0.08 }, { "link_quality", 0.9 },
     { "detune", 0.5 }, { "rx_drift", 0.04 }, { "agc_rate", 0.35 },
-    { "agc_breath", 0.06 }, { "rx_bw", 2800 }, { "adc_depth", 15 }
+    { "agc_breath", 0.06 }, { "rx_bw", 2800 }, { "adc_depth", 15 },
+    { "floor", 0.03 }
   },
   [3] = { name = "GOOD",
     { "tx_freq", 4800 }, { "osc_jitter", 0.1 }, { "pilot_leak", 0.02 },
@@ -336,7 +338,8 @@ local fidelity_presets = {
     { "multipath", 0.15 }, { "doppler", 1.5 }, { "fade_rate", 0.2 },
     { "fade_depth", 0.2 }, { "smear", 0.1 }, { "link_quality", 0.85 },
     { "detune", 1 }, { "rx_drift", 0.06 }, { "agc_rate", 0.4 },
-    { "agc_breath", 0.08 }, { "rx_bw", 2600 }, { "adc_depth", 14 }
+    { "agc_breath", 0.08 }, { "rx_bw", 2600 }, { "adc_depth", 14 },
+    { "floor", 0.05 }
   },
   [4] = { name = "FAIR",
     { "tx_freq", 4800 }, { "osc_jitter", 0.15 }, { "pilot_leak", 0.03 },
@@ -344,7 +347,8 @@ local fidelity_presets = {
     { "multipath", 0.25 }, { "doppler", 2.5 }, { "fade_rate", 0.3 },
     { "fade_depth", 0.35 }, { "smear", 0.15 }, { "link_quality", 0.75 },
     { "detune", 2 }, { "rx_drift", 0.1 }, { "agc_rate", 0.45 },
-    { "agc_breath", 0.1 }, { "rx_bw", 2400 }, { "adc_depth", 16 }
+    { "agc_breath", 0.1 }, { "rx_bw", 2400 }, { "adc_depth", 16 },
+    { "floor", 0.08 }
   },
   [5] = { name = "AVERAGE",
     { "tx_freq", 4800 }, { "osc_jitter", 0.2 }, { "pilot_leak", 0.05 },
@@ -352,7 +356,8 @@ local fidelity_presets = {
     { "multipath", 0.35 }, { "doppler", 3.5 }, { "fade_rate", 0.35 },
     { "fade_depth", 0.45 }, { "smear", 0.2 }, { "link_quality", 0.65 },
     { "detune", 3 }, { "rx_drift", 0.15 }, { "agc_rate", 0.5 },
-    { "agc_breath", 0.12 }, { "rx_bw", 2200 }, { "adc_depth", 16 }
+    { "agc_breath", 0.12 }, { "rx_bw", 2200 }, { "adc_depth", 16 },
+    { "floor", 0.1 }
   },
   [6] = { name = "POOR",
     { "tx_freq", 4800 }, { "osc_jitter", 0.25 }, { "pilot_leak", 0.07 },
@@ -360,7 +365,8 @@ local fidelity_presets = {
     { "multipath", 0.45 }, { "doppler", 5.0 }, { "fade_rate", 0.45 },
     { "fade_depth", 0.55 }, { "smear", 0.28 }, { "link_quality", 0.55 },
     { "detune", 5 }, { "rx_drift", 0.2 }, { "agc_rate", 0.55 },
-    { "agc_breath", 0.15 }, { "rx_bw", 2000 }, { "adc_depth", 14 }
+    { "agc_breath", 0.15 }, { "rx_bw", 2000 }, { "adc_depth", 14 },
+    { "floor", 0.15 }
   },
   [7] = { name = "BAD",
     { "tx_freq", 4800 }, { "osc_jitter", 0.3 }, { "pilot_leak", 0.1 },
@@ -368,7 +374,8 @@ local fidelity_presets = {
     { "multipath", 0.55 }, { "doppler", 7.0 }, { "fade_rate", 0.55 },
     { "fade_depth", 0.65 }, { "smear", 0.35 }, { "link_quality", 0.4 },
     { "detune", 8 }, { "rx_drift", 0.3 }, { "agc_rate", 0.6 },
-    { "agc_breath", 0.18 }, { "rx_bw", 1800 }, { "adc_depth", 12 }
+    { "agc_breath", 0.18 }, { "rx_bw", 1800 }, { "adc_depth", 12 },
+    { "floor", 0.2 }
   },
   [8] = { name = "DEGRADED",
     { "tx_freq", 4800 }, { "osc_jitter", 0.4 }, { "pilot_leak", 0.15 },
@@ -376,7 +383,8 @@ local fidelity_presets = {
     { "multipath", 0.65 }, { "doppler", 9.0 }, { "fade_rate", 0.65 },
     { "fade_depth", 0.75 }, { "smear", 0.42 }, { "link_quality", 0.3 },
     { "detune", 12 }, { "rx_drift", 0.4 }, { "agc_rate", 0.65 },
-    { "agc_breath", 0.2 }, { "rx_bw", 1600 }, { "adc_depth", 10 }
+    { "agc_breath", 0.2 }, { "rx_bw", 1600 }, { "adc_depth", 10 },
+    { "floor", 0.25 }
   },
   [9] = { name = "FRINGE",
     { "tx_freq", 4800 }, { "osc_jitter", 0.5 }, { "pilot_leak", 0.2 },
@@ -384,7 +392,8 @@ local fidelity_presets = {
     { "multipath", 0.75 }, { "doppler", 12.0 }, { "fade_rate", 0.75 },
     { "fade_depth", 0.85 }, { "smear", 0.5 }, { "link_quality", 0.2 },
     { "detune", 18 }, { "rx_drift", 0.5 }, { "agc_rate", 0.7 },
-    { "agc_breath", 0.25 }, { "rx_bw", 1400 }, { "adc_depth", 8 }
+    { "agc_breath", 0.25 }, { "rx_bw", 1400 }, { "adc_depth", 8 },
+    { "floor", 0.3 }
   },
   [10] = { name = "VOID",
     { "tx_freq", 4800 }, { "osc_jitter", 0.6 }, { "pilot_leak", 0.3 },
@@ -392,7 +401,8 @@ local fidelity_presets = {
     { "multipath", 0.85 }, { "doppler", 16.0 }, { "fade_rate", 0.85 },
     { "fade_depth", 0.95 }, { "smear", 0.6 }, { "link_quality", 0.1 },
     { "detune", 25 }, { "rx_drift", 0.6 }, { "agc_rate", 0.75 },
-    { "agc_breath", 0.3 }, { "rx_bw", 1200 }, { "adc_depth", 7 }
+    { "agc_breath", 0.3 }, { "rx_bw", 1200 }, { "adc_depth", 7 },
+    { "floor", 0.35 }
   },
   [11] = { name = "XTINA",
     { "tx_freq", 4800 }, { "osc_jitter", 0.7 }, { "pilot_leak", 0.4 },
@@ -400,7 +410,8 @@ local fidelity_presets = {
     { "multipath", 0.9 }, { "doppler", 18.0 }, { "fade_rate", 0.9 },
     { "fade_depth", 0.95 }, { "smear", 0.65 }, { "link_quality", 0.08 },
     { "detune", 30 }, { "rx_drift", 0.7 }, { "agc_rate", 0.8 },
-    { "agc_breath", 0.35 }, { "rx_bw", 1000 }, { "adc_depth", 6 }
+    { "agc_breath", 0.35 }, { "rx_bw", 1000 }, { "adc_depth", 6 },
+    { "floor", 0.4 }
   },
   [12] = { name = "XBAJA",
     { "tx_freq", 4800 }, { "osc_jitter", 0.8 }, { "pilot_leak", 0.5 },
@@ -408,7 +419,8 @@ local fidelity_presets = {
     { "multipath", 0.92 }, { "doppler", 19.0 }, { "fade_rate", 0.92 },
     { "fade_depth", 0.98 }, { "smear", 0.7 }, { "link_quality", 0.05 },
     { "detune", 35 }, { "rx_drift", 0.8 }, { "agc_rate", 0.85 },
-    { "agc_breath", 0.4 }, { "rx_bw", 800 }, { "adc_depth", 6 }
+    { "agc_breath", 0.4 }, { "rx_bw", 800 }, { "adc_depth", 6 },
+    { "floor", 0.45 }
   },
   [13] = { name = "XFRINGE",
     { "tx_freq", 4800 }, { "osc_jitter", 0.85 }, { "pilot_leak", 0.6 },
@@ -416,7 +428,8 @@ local fidelity_presets = {
     { "multipath", 0.95 }, { "doppler", 19.5 }, { "fade_rate", 0.95 },
     { "fade_depth", 0.99 }, { "smear", 0.75 }, { "link_quality", 0.03 },
     { "detune", 40 }, { "rx_drift", 0.85 }, { "agc_rate", 0.88 },
-    { "agc_breath", 0.45 }, { "rx_bw", 600 }, { "adc_depth", 6 }
+    { "agc_breath", 0.45 }, { "rx_bw", 600 }, { "adc_depth", 6 },
+    { "floor", 0.5 }
   },
   [14] = { name = "XVOID",
     { "tx_freq", 4800 }, { "osc_jitter", 0.9 }, { "pilot_leak", 0.7 },
@@ -424,7 +437,8 @@ local fidelity_presets = {
     { "multipath", 0.97 }, { "doppler", 20.0 }, { "fade_rate", 0.97 },
     { "fade_depth", 0.99 }, { "smear", 0.8 }, { "link_quality", 0.02 },
     { "detune", 45 }, { "rx_drift", 0.9 }, { "agc_rate", 0.9 },
-    { "agc_breath", 0.48 }, { "rx_bw", 500 }, { "adc_depth", 6 }
+    { "agc_breath", 0.48 }, { "rx_bw", 500 }, { "adc_depth", 6 },
+    { "floor", 0.55 }
   },
   [15] = { name = "EDGE",
     { "tx_freq", 6000 }, { "osc_jitter", 0.95 }, { "pilot_leak", 0.8 },
@@ -432,7 +446,8 @@ local fidelity_presets = {
     { "multipath", 0.98 }, { "doppler", 20.0 }, { "fade_rate", 0.98 },
     { "fade_depth", 1.0 }, { "smear", 0.85 }, { "link_quality", 0.01 },
     { "detune", 48 }, { "rx_drift", 0.95 }, { "agc_rate", 0.92 },
-    { "agc_breath", 0.5 }, { "rx_bw", 400 }, { "adc_depth", 6 }
+    { "agc_breath", 0.5 }, { "rx_bw", 400 }, { "adc_depth", 6 },
+    { "floor", 0.6 }
   },
   [16] = { name = "VOIDMAX",
     { "tx_freq", 9000 }, { "osc_jitter", 1.0 }, { "pilot_leak", 1.0 },
@@ -440,7 +455,8 @@ local fidelity_presets = {
     { "multipath", 1.0 }, { "doppler", 20.0 }, { "fade_rate", 1.0 },
     { "fade_depth", 1.0 }, { "smear", 1.0 }, { "link_quality", 0.0 },
     { "detune", 50 }, { "rx_drift", 1.0 }, { "agc_rate", 1.0 },
-    { "agc_breath", 0.6 }, { "rx_bw", 400 }, { "adc_depth", 6 }
+    { "agc_breath", 0.6 }, { "rx_bw", 400 }, { "adc_depth", 6 },
+    { "floor", 0.65 }
   }
 }
 
