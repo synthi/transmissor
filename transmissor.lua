@@ -47,8 +47,7 @@ end
 -- METRO REFERENCES (prevent GC from collecting them)
 -- =========================================================
 
-local lfo_metro = nil
-local screen_metro = nil
+local main_metro = nil  -- single metro for LFO + grid
 
 -- =========================================================
 -- LFO STATE (inherited concept from EdgeField)
@@ -216,16 +215,13 @@ function init()
   if apply_fidelity_preset then apply_fidelity_preset(1) end
   if apply_interference_preset then apply_interference_preset(1) end
 
-  -- LFO update at 25fps (reference stored to prevent GC)
-  lfo_metro = metro.init(function()
+  -- Single metro for LFO + grid at 25fps
+  -- (norns calls redraw() automatically — NO separate screen metro!)
+  main_metro = metro.init(function()
     update_lfos()
     if grid_redraw then grid_redraw() end
   end, 1/25)
-  lfo_metro:start()
-
-  -- Screen redraw at 15fps (reference stored to prevent GC)
-  screen_metro = metro.init(redraw, 1/15)
-  screen_metro:start()
+  main_metro:start()
 
   params:bang()
 
@@ -242,7 +238,8 @@ end
 -- =========================================================
 
 function cleanup()
+  if main_metro then main_metro:stop() end
   if grid_cleanup then grid_cleanup() end
-  engine.trail_clear(0.0)
+  pcall(function() engine.trail_clear(0.0) end)
   print("[Transmissor] Cleaned up")
 end
