@@ -1,4 +1,4 @@
-// Engine_Transmissor.sc — Transmissor v1.0.2
+// Engine_Transmissor.sc — Transmissor v1.0.3
 // Shortwave SSB transmission simulator engine for norns
 // Audio input → SSB modulation → RF effects → SSB demodulation → output
 //
@@ -71,7 +71,7 @@ Engine_Transmissor : CroneEngine {
             ampMod = LFNoise1.kr(ampLFO).range(0.3, 1.0);
 
             sig = SinOsc.ar(pitchMod) * ampMod * volSmooth;
-            sig = BPF.ar(sig, freqSmooth, 0.02);
+            sig = BPF.ar(sig, freqSmooth, 0.1);  // rq más ancho = menos resonancia
 
             Out.ar(ambientBus, sig ! 2);
 
@@ -143,12 +143,12 @@ Engine_Transmissor : CroneEngine {
                 tx_freq = 4800, osc_jitter = 0.2, pilot_leak = 0.0,
                 saturation = 0.0, harmonic_drive = 0.0, key_click = 0.0,
                 multipath = 0.3, doppler = 3.0, fade_rate = 0.3,
-                fade_depth = 0.5, smear = 0.2, link_quality = 0.8,
+                fade_depth = 0.5, smear = 0.2, link_quality = 1.0,
                 atmos = 0.2, space_hum = 0.05, whistle = 0.0,
                 hum = 0.0, e_skip = 0.0, borealis = 0.0,
                 detune = 0.0, rx_drift = 0.1, agc_rate = 0.4,
                 agc_breath = 0.1, rx_bw = 2400, adc_depth = 16,
-                input_trim = 0.8, blend = 1.0, floor = 0.3,
+                input_trim = 1.0, blend = 1.0, floor = 0.3,
                 hum_level = 0.05, distance = 0.3,
                 rev_wet = 0.0, rev_decay = 0.3, rev_damp = 0.5,
                 ech_wet = 0.0, ech_time = 0.3, ech_fb = 0.3,
@@ -162,8 +162,9 @@ Engine_Transmissor : CroneEngine {
             var tapDelay, tapGain, harmonicSig;
             var rfReverb, rfEcho, rfChorus, rfComb, rfDist, rfFBank;
 
-            // 1. INPUT
-            input = In.ar(0, 1) * input_trim;
+            // 1. INPUT — SoundIn.ar(0) lee hardware input (bus 2 interno en norns)
+            // In.ar(0) seria el OUTPUT bus, no el input!
+            input = SoundIn.ar(0) * input_trim;
 
             // 2. KEY CLICK
             input = input * (1 + (key_click *
@@ -484,12 +485,12 @@ Engine_Transmissor : CroneEngine {
         this.addCommand("set_distance", "f", { arg msg;
             var d = msg[1].clip(0.0, 1.0);
             distanceVal = d;
-            carrierSynth.set(\vol,      d * 0.18);
-            noiseSynth.set(\vol,        d * 0.22);
+            carrierSynth.set(\vol,      d * 0.06);  // reducido para evitar pitido
+            noiseSynth.set(\vol,        d * 0.15);
             noiseSynth.set(\popRate,    d * 4.0 + 0.3);
-            masterSynth.set(\bandwidth, 4000 - (d * 2800));
-            masterSynth.set(\ambientVol, d * 0.55);
-            inputSynth.set(\blend,      1.0 - (d * 0.2));
+            masterSynth.set(\bandwidth, (4000 - (d * 2500)).max(1500));  // min 1500Hz
+            masterSynth.set(\ambientVol, d * 0.4);
+            inputSynth.set(\blend,      1.0 - (d * 0.15));
         });
 
         // =====================================================

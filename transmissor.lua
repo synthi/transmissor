@@ -1,7 +1,15 @@
--- Transmissor v1.0
+-- Transmissor v1.0.3
 -- Shortwave SSB transmission simulator
 -- Audio input → SSB modulation → RF effects → SSB demodulation → output
 -- Based on concepts from EdgeField but completely rewritten for norns
+--
+-- Changelog:
+--   v1.0.3  Fix LFO corrupting tx_freq (carrier LFO only modulates ambient synth)
+--           Reduced carrier ambient synth volume to prevent 4800Hz tone
+--           input_trim default → 1.0 (unity gain)
+--   v1.0.2  FreShift → FreqShift
+--   v1.0.1  CosOsc → SinOsc(pi/2)
+--   v1.0    Initial release
 
 engine.name = 'Transmissor'
 
@@ -61,7 +69,8 @@ local function update_lfos()
   local carrier_depth = (carrier_depth_col / 15.0) * CARRIER_FREQ_DEPTH
   local carrier_sine  = math.sin(carrier_phase * math.pi * 2)
   local carrier_val   = params:get("tx_freq") + (carrier_sine * carrier_depth)
-  engine.set_tx_freq(math.max(100, carrier_val))
+  -- LFO modula solo el synth de carrier ambiente, NO el inputSynth
+  engine.set_carrier_freq(math.max(100, carrier_val))
 
   local static_depth = (static_depth_col / 15.0) * STATIC_DEPTH
   local static_sine  = math.sin(static_phase * math.pi * 2) +

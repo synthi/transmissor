@@ -103,7 +103,7 @@ function setup_parameters()
   params:add_control("smear", "Dispersion",
     cs(0, 1, 'lin', 0, 0.2))
   params:add_control("link_quality", "Link SNR",
-    cs(0, 1, 'lin', 0, 0.8))
+    cs(0, 1, 'lin', 0, 1.0))
 
   params:add_separator("INTERFERENCE")
 
@@ -138,7 +138,7 @@ function setup_parameters()
   params:add_separator("MIX")
 
   params:add_control("input_trim", "Input Gain",
-    cs(0, 1, 'lin', 0, 0.8))
+    cs(0, 2, 'lin', 0, 1.0))
   params:add_control("blend", "Dry/Wet",
     cs(0, 1, 'lin', 0, 1))
   params:add_control("floor", "Noise Floor",
