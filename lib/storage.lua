@@ -79,6 +79,29 @@ function Storage.load_data(pset_id)
   end
   _G.user_preset_selected = pack.user_preset_selected or 0
 
+  -- Recall selected snapshot: apply its params (robust: skip missing)
+  if pack.user_preset_selected and pack.user_preset_selected > 0 then
+    local slot = pack.user_preset_selected
+    local preset = _G.user_presets[slot]
+    if preset and preset.data then
+      for k, v in pairs(preset.data) do
+        if k ~= "current_fidelity" and k ~= "current_interference" and k ~= "current_page" then
+          pcall(function() params:set(k, v) end)
+        end
+      end
+      if preset.data.current_fidelity then
+        _G.current_fidelity = preset.data.current_fidelity
+      end
+      if preset.data.current_interference then
+        _G.current_interference = preset.data.current_interference
+      end
+      if preset.data.current_page then
+        _G.current_page = preset.data.current_page
+      end
+    end
+    print("[Transmissor] Recalled selected snapshot " .. slot)
+  end
+
   -- Restore sequencers (in stopped state, ready to play)
   if pack.seq_slots then
     for i = 1, 4 do

@@ -20,7 +20,7 @@ function ui_redraw()
   local ok, err = pcall(function()
     local cp = _G.current_page or 1
     local dm = _G.distance_mode or false
-    local sa = _G.shift_active or false
+    local sa = (_G.page_shift and _G.page_shift[cp]) or false
     local cf = _G.current_fidelity or 1
     local ci = _G.current_interference or 1
 
@@ -32,7 +32,7 @@ function ui_redraw()
     screen.move(0, 10)
     screen.text(page.name)
 
-    -- Shift indicator: "1/2" or "2/2" (only if page has shift params)
+    -- Shift indicator: "1/2" or "2/2" (page-specific shift)
     local has_shift = false
     if page.shift then
       for i = 1, 3 do
@@ -43,6 +43,12 @@ function ui_redraw()
       screen.level(6)
       screen.move(128, 10)
       screen.text_right(sa and "2/2" or "1/2")
+    end
+    -- Global shift indicator (col 16 style)
+    if _G.shift_active then
+      screen.level(4)
+      screen.move(116, 10)
+      screen.text_right("S")
     end
 
     -- LINES 2-4: Parameters (spaced at y=24, 36, 48)

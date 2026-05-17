@@ -69,8 +69,12 @@ local ramp_state = {
 }
 
 local function get_param_for_row(page, row)
-  local sa = _G.shift_active or false
-  if sa and page.shift then
+  -- Use page-specific shift (not global)
+  local ps = false
+  if _G.page_shift and _G.current_page then
+    ps = _G.page_shift[_G.current_page] or false
+  end
+  if ps and page.shift then
     return page.shift[row] or page.main[row]
   else
     return page.main[row]
@@ -147,7 +151,18 @@ local function recall_user_preset(slot)
   local d = preset.data
   for _, p in ipairs(ALL_PARAMS) do
     if d[p] ~= nil then
-      params:set(p, d[p])
+      -- Robust: skip if param no longer exists (old psets)
+      local ok, _ = pcall(function() params:set(p, d[p]) end)
+      if not ok then
+        print("[Transmissor] Skipping missing param: " .. p)
+      end
+    end
+  end
+  -- Also restore any extra params stored in preset that we don't have in ALL_PARAMS
+  -- (handles params renamed/removed between versions)
+  for k, v in pairs(d) do
+    if k ~= "current_fidelity" and k ~= "current_interference" and k ~= "current_page" then
+      local ok, _ = pcall(function() params:set(k, v) end)
     end
   end
   if d.current_fidelity then _G.current_fidelity = d.current_fidelity end
@@ -301,26 +316,27 @@ function grid_key(x, y, z)
       return
     end
 
-    -- PAGE BUTTONS — same page = instant shift toggle, different page = change + hold for shift
+    -- PAGE BUTTONS — toggle page-specific shift (not global shift)
     if is_page_col(x) then
       if z == 1 then
         local target_page = page_cols[x]
         if target_page == _G.current_page then
-          -- Same page: instant shift toggle
-          _G.shift_active = not _G.shift_active
+          -- Same page: instant page-shift toggle
+          _G.page_shift[target_page] = not (_G.page_shift[target_page] or false)
           page_press_time = 0
         else
-          -- Different page: change page + start timer
+          -- Different page: change page + start timer for shift
           _G.current_page = target_page
           _G.distance_mode = false
           page_press_time = util.time()
         end
       else
-        -- Release: toggle shift only if we changed pages + held >150ms
+        -- Release: toggle page-shift only if we changed pages + held >150ms
         if page_press_time > 0 then
           local hold = util.time() - page_press_time
+          local cp = _G.current_page
           if hold > 0.15 then
-            _G.shift_active = not _G.shift_active
+            _G.page_shift[cp] = not (_G.page_shift[cp] or false)
           end
           page_press_time = 0
         end
@@ -339,16 +355,13 @@ function grid_key(x, y, z)
     if x >= 1 and x <= 10 then
       local slot = x
 
-      -- Auto-exit shift mode so presets always work
-      _G.shift_active = false
-
-      local sa = false  -- always non-shift for presets
+      local sa = _G.shift_active or false
 
       -- Record for sequencers
       record_event(x, y, z)
 
       if sa then
-        -- Shift + button = clear preset
+        -- Global shift + button = clear preset
         if z == 1 then
           clear_user_preset(slot)
         end
@@ -390,13 +403,10 @@ function grid_key(x, y, z)
     if x >= 12 and x <= 15 then
       local slot = x - 11  -- 1-4
 
-      -- Auto-exit shift mode so sequencers always work
-      _G.shift_active = false
-
-      local sa = false  -- always non-shift for sequencers
+      local sa = _G.shift_active or false
 
       if sa then
-        -- Shift + seq = clear
+        -- Global shift + seq = clear
         if z == 1 then
           clear_seq(slot)
           update_seq_active()
@@ -735,6 +745,12 @@ function init_grid()
     }
   end
   _G.seq_active = false
+
+  -- Init page-specific shift states (all pages start non-shifted)
+  _G.page_shift = {}
+  for i = 1, 10 do
+    _G.page_shift[i] = false
+  end
 
   print("[Transmissor] Grid connected (v1.5.1)")
 end
