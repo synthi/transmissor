@@ -26,7 +26,6 @@ current_fidelity = 1
 current_interference = 1
 distance_mode = false
 shift_active = false
-ptt_active = false  -- Key Click crackle: OFF by default
 
 -- =========================================================
 -- MODULE LOADER
@@ -140,7 +139,8 @@ function enc(n, d)
   if not page then return end
 
   local param_name
-  if shift_active then
+  local ps = (_G.page_shift or {})[current_page] or false
+  if ps then
     param_name = page.shift[n] or page.main[n]
   else
     param_name = page.main[n]
@@ -213,7 +213,7 @@ function init()
     if Storage then Storage.load_data(id) end
   end
 
-  print("[Transmissor] Ready v1.4.0")
+  print("[Transmissor] Ready v1.5.2")
 end
 
 -- =========================================================
