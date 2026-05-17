@@ -100,6 +100,8 @@ Engine_Transmissor : CroneEngine {
                 fbn_wet = 0.0, fbn_spread = 0.5, fbn_rate = 0.3,
                 ech_rt_wet = 0.0, ech_rt_time = 0.5, ech_rt_fb = 0.4;
 
+            var echoTimeSmooth;
+
             var input, hilbert, rf, rfMultipath, rfEffects;
             var demod, sig, compSig, agcKey;
             var tapDelay, tapGain, harmonicSig;
@@ -111,6 +113,7 @@ Engine_Transmissor : CroneEngine {
 
             // 0. ECHO RETURN — receive from feedback loop (re-transmission)
             echoReturn = LocalIn.ar(1);
+            echoTimeSmooth = ech_rt_time.lag(0.08);  // smooth delay time (anti-zipper)
 
             // 1. INPUT + echo return injection (before modulator)
             input = SoundIn.ar(0) * input_trim;
@@ -270,7 +273,7 @@ Engine_Transmissor : CroneEngine {
             // 22. OUTPUT + ECHO RETURN FEEDBACK (radio echo)
             Out.ar(voiceBus, sig ! 2);
             LocalOut.ar(Limiter.ar(
-                DelayL.ar(sig, 4.0, ech_rt_time.max(0.05)) * ech_rt_fb,
+                DelayL.ar(sig, 10.0, echoTimeSmooth.max(0.05)) * ech_rt_fb,
                 0.95
             ));
 
