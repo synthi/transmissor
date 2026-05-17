@@ -1,5 +1,5 @@
 -- =========================================================
--- UI — Transmissor v1.5.0
+-- UI — Transmissor v1.5.1
 -- OLED redraw — guaranteed screen.update()
 -- Layout: Name: value [===plasma bar===]
 -- Values right-aligned at x=88, bars at x=93 (35px)
@@ -74,12 +74,16 @@ function ui_redraw()
       end
     end
 
-    -- LINE 5: Preset info (bottom, with breathing room)
+    -- LINE 5: Preset info — fixed positions (never shifts)
     local fid_name = (fidelity_names or {})[cf] or "MANUAL"
     local int_name = (interference_names or {})[ci] or "MANUAL"
     screen.level(4)
+    -- Fidelity: always starts at x=0
     screen.move(0, 61)
-    screen.text("F" .. cf .. ":" .. fid_name .. "  I" .. ci .. ":" .. int_name)
+    screen.text("F" .. cf .. ":" .. fid_name)
+    -- Interference: always starts at x=66
+    screen.move(66, 61)
+    screen.text("I" .. ci .. ":" .. int_name)
 
   end)
 

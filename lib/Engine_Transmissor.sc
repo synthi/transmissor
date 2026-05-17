@@ -1,4 +1,4 @@
-// Engine_Transmissor.sc — Transmissor v1.5.0
+// Engine_Transmissor.sc — Transmissor v1.5.1
 // Shortwave SSB transmission simulator engine for norns
 // Audio input → SSB modulation → RF effects → SSB demodulation → output
 //
@@ -84,7 +84,6 @@ Engine_Transmissor : CroneEngine {
             arg
                 tx_freq = 4800, osc_jitter = 0.2, pilot_leak = 0.0,
                 saturation = 0.0, harmonic_drive = 0.0,
-                key_click = 0.5, key_gate = 0,
                 multipath = 0.3, doppler = 3.0, fade_rate = 0.3,
                 fade_depth = 0.5, smear = 0.2, link_quality = 1.0,
                 atmos = 0.2, space_hum = 0.05, whistle = 0.0,
@@ -108,7 +107,6 @@ Engine_Transmissor : CroneEngine {
             var detuneSmooth, detuneAtten;
             var meteorTrigger, cosmicPing;
             var sigEnv, noiseFloor, eTrig, eEnv, ditherSig;
-            var clickComb;
             var echoReturn;
 
             // 0. ECHO RETURN — receive from feedback loop (re-transmission)
@@ -220,10 +218,6 @@ Engine_Transmissor : CroneEngine {
             rfChorus = rfChorus + (DelayC.ar(rf, 0.03, SinOsc.kr(cho_rate * 0.73).range(0.003, 0.003 + cho_depth * 0.5)) * cho_wet * 0.2);
             rf = Select.ar(cho_wet > 0.001, [ rf, rfChorus ]);
 
-            // KEY CLICK — Same structure as FX Comb (freq=160, fb=0.64→5.12)
-            clickComb = CombL.ar(rf, 0.5, 1.0 / 160, 5.12);
-            rf = rf + (clickComb * key_click * key_gate);
-
             // FX Comb
             rfComb = Select.ar(com_wet > 0.001, [ rf, CombL.ar(rf, 0.5, 1.0 / com_freq.max(20), com_fb * 8.0) ]);
             rf = rfComb;
@@ -292,9 +286,6 @@ Engine_Transmissor : CroneEngine {
         this.addCommand("set_pilot_leak", "f", { arg msg; inputSynth.set(\pilot_leak, msg[1]); });
         this.addCommand("set_saturation", "f", { arg msg; inputSynth.set(\saturation, msg[1]); });
         this.addCommand("set_harmonic_drive", "f", { arg msg; inputSynth.set(\harmonic_drive, msg[1]); });
-        this.addCommand("set_key_click", "f", { arg msg; inputSynth.set(\key_click, msg[1]); });
-        this.addCommand("set_key_gate", "f", { arg msg; inputSynth.set(\key_gate, msg[1]); });
-
         // AIR
         this.addCommand("set_multipath", "f", { arg msg; inputSynth.set(\multipath, msg[1]); });
         this.addCommand("set_doppler", "f", { arg msg; inputSynth.set(\doppler, msg[1]); });

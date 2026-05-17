@@ -1,5 +1,5 @@
 -- =========================================================
--- PARAMETERS — Transmissor v1.5.0
+-- PARAMETERS — Transmissor v1.5.1
 -- Defines all params, pages, presets (16+16)
 -- =========================================================
 
@@ -33,7 +33,7 @@ local interference_names = {
 local pages = {
   [1] = { name = "TRANSMITTER",
     main = { "tx_freq", "osc_jitter", "pilot_leak" },
-    shift = { "saturation", "harmonic_drive", "key_click" }
+    shift = { "saturation", "harmonic_drive", nil }
   },
   [2] = { name = "PROPAGATION",
     main = { "multipath", "fade_rate", "fade_depth" },
@@ -95,9 +95,6 @@ function setup_parameters()
     cs(0, 1, 'lin', 0, 0))
   params:add_control("harmonic_drive", "Harmonic Drive",
     cs(0, 1, 'lin', 0, 0))
-  params:add_control("key_click", "Ptt Click",
-    cs(0, 1, 'lin', 0, 0.5))
-
   params:add_separator("PROPAGATION")
 
   params:add_control("multipath", "Multipath",
@@ -207,7 +204,7 @@ function setup_parameters()
   params:add_control("ech_rt_time", "Echo Time",
     cs(0.05, 4.0, 'lin', 0, 0.5))
   params:add_control("ech_rt_fb", "Echo FB",
-    cs(0, 3.0, 'lin', 0, 0.4))
+    cs(0, 3.5, 'lin', 0, 0.4))
 
   params:add_control("fbn_wet", "FBank Wet",
     cs(0, 1, 'lin', 0, 0))
@@ -248,8 +245,6 @@ function setup_param_actions()
   params:set_action("pilot_leak", function(x) engine.set_pilot_leak(x) end)
   params:set_action("saturation", function(x) engine.set_saturation(x) end)
   params:set_action("harmonic_drive", function(x) engine.set_harmonic_drive(x) end)
-  params:set_action("key_click", function(x) engine.set_key_click(x) end)
-
   -- AIR
   params:set_action("multipath", function(x) engine.set_multipath(x) end)
   params:set_action("doppler", function(x) engine.set_doppler(x) end)

@@ -1,5 +1,5 @@
 -- =========================================================
--- GRID — Transmissor v1.4.0
+-- GRID — Transmissor v1.5.1
 -- Rows 1-3: interactive param bars (tap/hold ramp) + seq recording
 -- Rows 4-5: Fidelity/Interference presets + seq recording
 -- Row 6: empty
@@ -37,7 +37,7 @@ end
 
 -- All params for user preset save/restore
 local ALL_PARAMS = {
-  "tx_freq", "osc_jitter", "pilot_leak", "saturation", "harmonic_drive", "key_click",
+  "tx_freq", "osc_jitter", "pilot_leak", "saturation", "harmonic_drive",
   "multipath", "doppler", "fade_rate", "fade_depth", "smear", "link_quality",
   "atmos", "space_hum", "whistle", "hum", "e_skip", "borealis",
   "detune", "rx_drift", "agc_rate", "agc_breath", "rx_bw", "adc_depth",
@@ -328,13 +328,6 @@ function grid_key(x, y, z)
       return
     end
 
-    -- KEY CLICK (col 1) — simple gate: open on press, close on release
-    if x == 1 then
-      _G.ptt_active = (z == 1)
-      engine.set_key_gate(z)
-      return
-    end
-
     return
   end
 
@@ -345,7 +338,11 @@ function grid_key(x, y, z)
     -- USER PRESETS (cols 1-10)
     if x >= 1 and x <= 10 then
       local slot = x
-      local sa = _G.shift_active or false
+
+      -- Auto-exit shift mode so presets always work
+      _G.shift_active = false
+
+      local sa = false  -- always non-shift for presets
 
       -- Record for sequencers
       record_event(x, y, z)
@@ -392,7 +389,11 @@ function grid_key(x, y, z)
     -- SEQUENCERS (cols 12-15)
     if x >= 12 and x <= 15 then
       local slot = x - 11  -- 1-4
-      local sa = _G.shift_active or false
+
+      -- Auto-exit shift mode so sequencers always work
+      _G.shift_active = false
+
+      local sa = false  -- always non-shift for sequencers
 
       if sa then
         -- Shift + seq = clear
@@ -669,10 +670,8 @@ function grid_redraw()
     render_row7()
 
     -- ROW 8: Controls
-    -- Col 1: PTT momentary (2=off, 11=on)
-    grid_set_led(1, 8, _G.ptt_active and 11 or 2)
-    -- Cols 2-3: empty
-    grid_set_led(2, 8, 0); grid_set_led(3, 8, 0)
+    -- Cols 1-3: empty
+    grid_set_led(1, 8, 0); grid_set_led(2, 8, 0); grid_set_led(3, 8, 0)
     -- Col 4-6: FX pages (SPACE=4, TEXTURE=5, DESTROY=6)
     grid_set_led(4, 8, (_G.current_page == 4) and 11 or 1)
     grid_set_led(5, 8, (_G.current_page == 5) and 11 or 1)
@@ -737,7 +736,7 @@ function init_grid()
   end
   _G.seq_active = false
 
-  print("[Transmissor] Grid connected (v1.4.0)")
+  print("[Transmissor] Grid connected (v1.5.1)")
 end
 
 function grid_cleanup()
